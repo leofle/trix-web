@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>trix — where coding agents live</title>
+<meta name="description" content="A terminal workspace for Claude Code, Codex and any CLI agent. See which agent is working, which one needs you, and which one finished while you were looking elsewhere.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0e15;
+  --bg2: #13141d;
+  --surface: #16161e;
+  --surface-hi: #1f2233;
+  --line: #262a3d;
+  --fg: #a9b1d6;
+  --fg-hi: #e1e6ff;
+  --dim: #565f89;
+  --muted: #414868;
+  --accent: #7aa2f7;
+  --mag: #bb9af7;
+  --cyan: #7dcfff;
+  --work: #e0af68;
+  --block: #f7768e;
+  --done: #9ece6a;
+  --idle: #565f89;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+  --display: "Space Grotesk", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 16px/1.6 var(--mono);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+body::before {
+  /* dot grid + two soft glows */
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(900px 500px at 75% -10%, rgba(187,154,247,.16), transparent 70%),
+    radial-gradient(700px 500px at 10% 10%, rgba(122,162,247,.12), transparent 70%),
+    radial-gradient(rgba(169,177,214,.09) 1px, transparent 1px) 0 0 / 22px 22px;
+}
+a { color: inherit; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+@media (max-width: 600px) { .wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); } }
+
+/* ---------- nav ---------- */
+nav { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.brand img { width: 34px; height: 34px; }
+.word { font: 800 26px/1 var(--mono); color: var(--fg-hi); letter-spacing: -.04em; }
+.word .i { position: relative; }
+.word .i::after {
+  /* the dot over the i is the status light */
+  content: ""; position: absolute; left: 44%; top: .21em; width: .2em; height: .2em;
+  transform: translateX(-50%); border-radius: 50%; background: var(--done);
+  box-shadow: 0 0 10px var(--done);
+}
+.navlinks { display: flex; gap: 22px; font-size: 14px; }
+.navlinks a { text-decoration: none; color: var(--dim); transition: color .15s; }
+.navlinks a:hover { color: var(--fg-hi); }
+@media (max-width: 600px) { .navlinks a:not(.gh) { display: none; } }
+
+/* ---------- hero ---------- */
+.hero { display: grid; grid-template-columns: 1.25fr 1fr; align-items: center; gap: 40px; padding: 48px 0 56px; }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--cyan);
+  border: 1px solid var(--line); background: rgba(22,22,30,.7); padding: 5px 12px; border-radius: 999px; }
+.eyebrow b { color: var(--work); font-weight: 500; }
+h1 { font: 700 clamp(40px, 6vw, 68px)/1.02 var(--display); color: var(--fg-hi); letter-spacing: -.035em; margin: 22px 0 20px; }
+h1 .needs { color: var(--block); position: relative; white-space: nowrap; }
+h1 .needs::after { content: ""; position: absolute; left: 0; right: 0; bottom: .02em; height: .09em;
+  background: var(--block); opacity: .35; border-radius: 4px; }
+.lede { font-size: 16.5px; max-width: 34em; color: var(--fg); margin: 0 0 30px; }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.install {
+  display: inline-flex; align-items: center; gap: 12px; padding: 12px 14px 12px 18px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  font-size: 14.5px; color: var(--fg-hi); max-width: 100%;
+}
+.install .p { color: var(--done); }
+.install code { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.copy {
+  font: 500 12px var(--mono); color: var(--fg); background: var(--surface-hi); border: 1px solid var(--line);
+  border-radius: 8px; padding: 6px 10px; cursor: pointer; flex: none; transition: all .15s;
+}
+.copy:hover { color: var(--fg-hi); border-color: var(--accent); }
+.btn { text-decoration: none; font-size: 14.5px; padding: 12px 18px; border-radius: 12px; color: var(--bg);
+  background: linear-gradient(135deg, var(--mag), var(--accent) 60%, var(--cyan)); font-weight: 700;
+  box-shadow: 0 8px 30px -8px rgba(122,162,247,.6); transition: transform .15s; }
+.btn:hover { transform: translateY(-2px); }
+
+.stage { position: relative; display: grid; place-items: center; }
+.stage::before { content: ""; position: absolute; width: 78%; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle, var(--glow, rgba(122,162,247,.35)), transparent 65%); filter: blur(10px);
+  transition: background .4s; }
+.stage[data-state="blocked"] { --glow: rgba(247,118,142,.35); }
+.stage[data-state="done"] { --glow: rgba(158,206,106,.3); }
+.stage[data-state="working"] { --glow: rgba(224,175,104,.28); }
+.stage .mascot { width: min(100%, 360px); position: relative; }
+.bubble {
+  position: absolute; top: 8%; right: 2%; font-size: 13px; color: var(--fg-hi); background: var(--surface);
+  border: 1px solid var(--line); padding: 8px 12px; border-radius: 12px 12px 12px 4px; white-space: nowrap;
+  box-shadow: 0 10px 30px -10px #000; transition: border-color .3s;
+}
+.bubble .g { display: inline-block; width: 1.1em; }
+.stage[data-state="blocked"] .bubble { border-color: var(--block); }
+
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; padding-top: 16px; gap: 8px; }
+  .stage { order: -1; }
+  .stage .mascot { width: 220px; }
+  .bubble { right: auto; left: calc(50% + 70px); top: 6%; }
+}
+@media (max-width: 480px) { .bubble { left: auto; right: 0; top: 0; } }
+
+/* ---------- mascot ---------- */
+.mascot { overflow: visible; --st: var(--idle); }
+.mascot[data-state="working"] { --st: var(--work); }
+.mascot[data-state="blocked"] { --st: var(--block); }
+.mascot[data-state="done"]    { --st: var(--done); }
+.mascot .bulb, .mascot .bulb-glow { fill: var(--st); transition: fill .3s; }
+.mascot .bulb-glow { opacity: .35; }
+.mascot .bob { animation: bob 3.2s ease-in-out infinite; }
+.mascot .shadow { animation: shadow 3.2s ease-in-out infinite; transform-origin: 100px 198px; }
+.mascot .look { transition: transform .18s ease-out; }
+.mascot .eye { transform-box: fill-box; transform-origin: center; animation: blink 5s infinite; }
+.mascot .eye:nth-child(2) { animation-delay: .04s; }
+.mascot .happy, .mascot .mouth-o { display: none; }
+.mascot[data-state="done"] .open { display: none; }
+.mascot[data-state="done"] .happy { display: inline; }
+.mascot[data-state="blocked"] .mouth-smile { display: none; }
+.mascot[data-state="blocked"] .mouth-o { display: inline; }
+.mascot[data-state="blocked"] .eye { animation: none; transform: scale(1.15); }
+.mascot[data-state="blocked"] .body-g { animation: shake .5s ease-in-out infinite; transform-origin: 100px 110px; }
+.mascot[data-state="blocked"] .bulb { animation: flash .6s steps(1) infinite; }
+.mascot[data-state="working"] .bulb-glow { animation: pulse 1.1s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes bob { 50% { transform: translateY(-7px); } }
+@keyframes shadow { 50% { transform: scale(.82); opacity: .2; } }
+@keyframes blink { 0%, 94%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+@keyframes shake { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
+@keyframes flash { 50% { opacity: .35; } }
+@keyframes pulse { 50% { transform: scale(1.5); opacity: .15; } }
+
+/* ---------- terminal demo ---------- */
+.term {
+  --c: 13.5px;
+  font: 400 var(--c)/1.55 var(--mono); color: #a9b1d6; background: #1a1b26;
+  border: 1px solid var(--line); border-radius: 14px; overflow: hidden; position: relative;
+  box-shadow: 0 40px 100px -30px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.02) inset;
+}
+.chrome { display: flex; align-items: center; gap: 7px; padding: 10px 14px; background: #16161e; border-bottom: 1px solid var(--line); }
+.chrome i { width: 11px; height: 11px; border-radius: 50%; background: var(--muted); }
+.chrome span { margin-left: auto; margin-right: auto; font-size: 12px; color: var(--dim); transform: translateX(-20px); }
+.topbar { display: flex; gap: 18px; padding: 8px 16px; background: #16161e; white-space: nowrap; overflow: hidden; }
+.topbar .k { margin-left: auto; color: var(--dim); }
+.tbody { display: grid; grid-template-columns: 290px 1fr; min-height: 380px; }
+.side { padding: 10px 0; border-right: 1px solid #222436; }
+.side h4 { margin: 0 0 6px; padding: 0 16px; font: 700 11px var(--mono); letter-spacing: .14em; color: var(--dim); }
+.ag { padding: 6px 16px 7px 13px; border-left: 3px solid transparent; transition: background .25s; white-space: nowrap; }
+.ag.sel { background: #24283b; border-left-color: var(--accent); }
+.ag.blk { background: rgba(247,118,142,.09); }
+.ag.sel.blk { border-left-color: var(--block); }
+.ag .r1 { display: flex; gap: 8px; }
+.ag .n { color: var(--dim); width: 1ch; }
+.ag .nm { color: #c0caf5; font-weight: 700; }
+.ag .t { margin-left: auto; color: var(--dim); }
+.ag .r2, .ag .r3 { padding-left: calc(2ch + 16px); overflow: hidden; text-overflow: ellipsis; }
+.ag .r2 { color: #a9b1d6; }
+.ag .r3 { color: var(--dim); }
+.ag .sp { color: var(--accent); letter-spacing: -.5px; }
+.ag .un { color: var(--cyan); }
+.pane { position: relative; padding: 12px 16px; min-width: 0; }
+.ptitle { display: flex; gap: 10px; color: var(--dim); border-bottom: 1px solid #222436; padding-bottom: 8px; margin-bottom: 10px; white-space: nowrap; overflow: hidden; }
+.ptitle .nm { color: #c0caf5; font-weight: 700; }
+.ptitle .r { margin-left: auto; }
+.lines div { white-space: pre; overflow: hidden; text-overflow: ellipsis; min-height: 1.55em; }
+.u { color: #c0caf5; } .u::before { content: "> "; color: var(--dim); }
+.dot { color: var(--done); } .dotw { color: #c0caf5; }
+.fd { color: var(--dim); }
+.perm { border: 1px solid var(--block); border-radius: 8px; padding: 6px 12px; margin: 8px 0; color: #c0caf5; }
+.perm div { min-height: 1.55em; }
+.perm .h { color: var(--block); font-weight: 700; }
+.perm .sel { color: var(--accent); }
+.strip {
+  position: absolute; left: 16px; right: 16px; top: 8px; display: flex; gap: 12px; align-items: center;
+  background: var(--block); color: #1a1b26; font-weight: 700; padding: 5px 12px; border-radius: 6px;
+  transform: translateY(-140%); opacity: 0; transition: all .3s cubic-bezier(.2,.9,.3,1.3); white-space: nowrap; overflow: hidden;
+}
+.strip.on { transform: none; opacity: 1; }
+.strip .k { margin-left: auto; font-weight: 500; opacity: .8; }
+.keyflash {
+  position: absolute; right: 18px; bottom: 16px; font: 700 15px var(--mono); color: var(--fg-hi);
+  background: #24283b; border: 1px solid #3b4261; border-bottom-width: 3px; border-radius: 8px; padding: 6px 12px;
+  opacity: 0; transform: scale(.8); transition: all .2s;
+}
+.keyflash.on { opacity: 1; transform: none; }
+.c-work { color: var(--work); } .c-block { color: var(--block); font-weight: 700; } .c-done { color: var(--done); font-weight: 700; }
+.c-idle { color: var(--dim); } .c-acc { color: var(--accent); } .c-start { color: var(--cyan); }
+@media (max-width: 760px) {
+  .term { --c: 12.5px; }
+  .tbody { grid-template-columns: 1fr; min-height: 0; }
+  .side { border-right: 0; }
+  .pane { display: none; }
+  .topbar .k { display: none; }
+}
+.under { text-align: center; color: var(--dim); font-size: 13px; margin: 16px 0 0; }
+
+/* ---------- sections ---------- */
+section { padding: 88px 0 0; }
+h2 { font: 700 clamp(28px, 4vw, 40px)/1.1 var(--display); color: var(--fg-hi); letter-spacing: -.03em; margin: 0 0 12px; }
+.sub { color: var(--dim); margin: 0 0 36px; max-width: 40em; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+@media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+.card { background: rgba(22,22,30,.75); border: 1px solid var(--line); border-radius: 16px; padding: 22px; transition: border-color .2s, transform .2s; }
+.card:hover { border-color: #3b4261; transform: translateY(-3px); }
+.card .ic { font-size: 22px; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; background: var(--surface-hi); margin-bottom: 14px; }
+.card h3 { font: 700 18px/1.25 var(--display); color: var(--fg-hi); margin: 0 0 8px; }
+.card p { margin: 0; font-size: 14px; color: var(--fg); }
+.card code, .sub code { color: var(--cyan); font-size: .95em; }
+
+/* states */
+.states { display: grid; grid-template-columns: 260px 1fr; gap: 36px; align-items: center; }
+.states .mascot { width: 220px; margin: 0 auto; display: block; }
+.chips { display: grid; gap: 10px; }
+.chip { display: grid; grid-template-columns: 44px 130px 1fr; align-items: center; gap: 8px; padding: 12px 16px; border-radius: 12px;
+  border: 1px solid var(--line); background: rgba(22,22,30,.75); cursor: default; transition: border-color .2s, background .2s; font-size: 14px; }
+.chip .g { font-size: 20px; text-align: center; }
+.chip b { color: var(--fg-hi); font-weight: 700; }
+.chip span:last-child { color: var(--dim); }
+.chip.on { border-color: currentColor; }
+.chip[data-s="working"].on { border-color: var(--work); background: rgba(224,175,104,.07); }
+.chip[data-s="blocked"].on { border-color: var(--block); background: rgba(247,118,142,.07); }
+.chip[data-s="done"].on    { border-color: var(--done); background: rgba(158,206,106,.07); }
+.chip[data-s="idle"].on    { border-color: var(--dim); }
+.chip[data-s="unseen"].on  { border-color: var(--cyan); background: rgba(125,207,255,.06); }
+@media (max-width: 760px) {
+  .states { grid-template-columns: 1fr; gap: 16px; }
+  .states .mascot { width: 160px; }
+  .chip { grid-template-columns: 36px 1fr; }
+  .chip span:last-child { grid-column: 2; font-size: 13px; }
+}
+
+/* keys */
+.keys { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 40px; }
+@media (max-width: 700px) { .keys { grid-template-columns: 1fr; } }
+.key { display: flex; align-items: center; gap: 14px; padding: 11px 0; border-bottom: 1px dashed var(--line); font-size: 14.5px; }
+.key span { margin-left: auto; color: var(--dim); text-align: right; }
+kbd { font: 700 13px var(--mono); color: var(--fg-hi); background: var(--surface-hi); border: 1px solid #3b4261;
+  border-bottom-width: 3px; border-radius: 7px; padding: 3px 8px; white-space: nowrap; }
+
+/* install */
+.code { background: #1a1b26; border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; font-size: 14.5px; overflow-x: auto; }
+.code div { white-space: pre; }
+.code .p { color: var(--done); user-select: none; }
+.code .cm { color: var(--dim); }
+.envs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; font-size: 13px; }
+.envs code { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 4px 10px; color: var(--cyan); }
+
+footer { margin-top: 110px; padding: 30px 0 40px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--dim); }
+footer img { width: 26px; }
+footer .r { margin-left: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- The mascot. Cloned wherever a [data-mascot] placeholder sits. -->
+<template id="mascot-tpl">
+<svg class="mascot" viewBox="0 0 200 210" aria-hidden="true">
+  <defs>
+    <linearGradient id="tb" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#c7a8ff"/>
+      <stop offset=".55" stop-color="#7aa2f7"/>
+      <stop offset="1" stop-color="#7dcfff"/>
+    </linearGradient>
+  </defs>
+  <ellipse class="shadow" cx="100" cy="198" rx="36" ry="6" fill="#000" opacity=".35"/>
+  <g class="bob">
+    <g class="body-g">
+      <path d="M100 46 V20" stroke="#7aa2f7" stroke-width="5" stroke-linecap="round"/>
+      <circle class="bulb-glow" cx="100" cy="15" r="15"/>
+      <circle class="bulb" cx="100" cy="15" r="7"/>
+      <rect x="45" y="55" width="110" height="110" rx="26" transform="rotate(45 100 110)" fill="url(#tb)"/>
+      <path d="M68 82 L88 62" stroke="#fff" stroke-opacity=".35" stroke-width="5" stroke-linecap="round"/>
+      <rect x="62" y="88" width="76" height="46" rx="15" fill="#16161e"/>
+      <g class="look">
+        <g class="open">
+          <rect class="eye" x="81" y="101" width="10" height="18" rx="5" fill="#c0caf5"/>
+          <rect class="eye" x="109" y="101" width="10" height="18" rx="5" fill="#c0caf5"/>
+        </g>
+        <g class="happy" fill="none" stroke="#c0caf5" stroke-width="3.5" stroke-linecap="round">
+          <path d="M80 112 q6 -9 12 0"/><path d="M108 112 q6 -9 12 0"/>
+        </g>
+      </g>
+      <ellipse cx="73" cy="124" rx="5" ry="3" fill="#f7768e" opacity=".55"/>
+      <ellipse cx="127" cy="124" rx="5" ry="3" fill="#f7768e" opacity=".55"/>
+      <path class="mouth-smile" d="M95 124 q5 4 10 0" fill="none" stroke="#c0caf5" stroke-width="2.5" stroke-linecap="round"/>
+      <ellipse class="mouth-o" cx="100" cy="126" rx="3.2" ry="3.8" fill="#c0caf5"/>
+    </g>
+  </g>
+</svg>
+</template>
+
+<div class="wrap">
+  <nav>
+    <a class="brand" href="#"><img src="favicon.svg" alt=""><span class="word">tr<span class="i">ı</span>x</span></a>
+    <div class="navlinks">
+      <a href="#features">features</a>
+      <a href="#states">states</a>
+      <a href="#keys">keys</a>
+      <a href="#install">install</a>
+      <a class="gh" href="https://github.com/leofle/trix">github ↗</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <span class="eyebrow"><b>⠹</b> a workspace where coding agents live</span>
+      <h1>Know which agent <span class="needs">needs you.</span></h1>
+      <p class="lede">Run Claude Code, Codex, shells or any CLI agent side by side. trix shows you at a glance which one is working, which one is waiting on you, and which one finished while you were looking elsewhere.</p>
+      <div class="cta">
+        <div class="install"><span class="p">$</span><code>cargo install --path .</code><button class="copy" data-copy="cargo install --path .">copy</button></div>
+        <a class="btn" href="#install">get trix →</a>
+      </div>
+    </div>
+    <div class="stage" id="hero-stage" data-state="working">
+      <div data-mascot id="hero-mascot"></div>
+      <div class="bubble" id="bubble"><span class="g c-work">⠹</span> 2 agents working</div>
+    </div>
+  </header>
+
+  <!-- live, scripted replica of the trix UI -->
+  <div class="term" id="term" aria-label="Animated demo of the trix interface">
+    <div class="chrome"><i></i><i></i><i></i><span>trix — ~/code</span></div>
+    <div class="topbar" id="topbar"></div>
+    <div class="tbody">
+      <div class="side"><h4 id="agcount">AGENTS 4</h4><div id="agents"></div></div>
+      <div class="pane">
+        <div class="ptitle" id="ptitle"></div>
+        <div class="lines" id="lines"></div>
+        <div class="strip" id="strip"></div>
+      </div>
+    </div>
+    <div class="keyflash" id="keyflash">alt+a</div>
+  </div>
+  <p class="under">That loop runs on its own: an agent asks for permission, the strip appears, <kbd>alt+a</kbd> takes you straight there.</p>
+
+  <section id="features">
+    <h2>The agent comes first.</h2>
+    <p class="sub">tmux and zellij don't know anything about agents. Other tools treat the agent as just another pane. trix is built around what each agent is doing.</p>
+    <div class="grid">
+      <div class="card"><div class="ic c-acc">⚓</div><h3>Hooks first, guessing second</h3><p>Claude Code and Codex report their own lifecycle: prompts, tool calls, permission requests, finished turns. Your agent configs are never touched.</p></div>
+      <div class="card"><div class="ic c-block">▲</div><h3>Feedback you can't miss</h3><p>A red strip over your current pane, a desktop notification, a terminal bell and a live title count. Each agent shows a sparkline, its branch and its diff so far.</p></div>
+      <div class="card"><div class="ic c-work">⌥</div><h3>One key to what matters</h3><p><code>alt+a</code> goes to the agent that has been blocked longest, then to finished work you haven't seen yet.</p></div>
+      <div class="card"><div class="ic c-start">▦</div><h3>Every agent at once</h3><p><code>alt+g</code> tiles all agents live. Blocked tiles turn red and the rest fade back a little.</p></div>
+      <div class="card"><div class="ic c-done">⑂</div><h3>Worktrees built in</h3><p>Each agent can get its own <code>trix/&lt;name&gt;</code> branch in a git worktree, so parallel agents never step on each other.</p></div>
+      <div class="card"><div class="ic" style="color:var(--mag)">⚡</div><h3>Fast and quiet</h3><p>Rust, <code>alacritty_terminal</code> and <code>ratatui</code>. About 0.4% of one core and 10 MB of RAM when idle. It follows your Omarchy theme live.</p></div>
+    </div>
+  </section>
+
+  <section id="states">
+    <h2>Five states, one glance.</h2>
+    <p class="sub">Hover a state to see it. The mascot's antenna uses the same colors the sidebar does.</p>
+    <div class="states">
+      <div data-mascot id="state-mascot"></div>
+      <div class="chips" id="chips">
+        <div class="chip" data-s="working"><span class="g c-work" data-spin>⠹</span><b>working</b><span>prompt submitted, tools running, or sustained output</span></div>
+        <div class="chip" data-s="blocked"><span class="g c-block">▲</span><b>needs you</b><span>permission request, a question, or an approval prompt on screen</span></div>
+        <div class="chip" data-s="done"><span class="g c-done">✓</span><b>done</b><span>the turn finished, or work went quiet</span></div>
+        <div class="chip" data-s="idle"><span class="g c-idle">○</span><b>idle</b><span>sitting at the prompt</span></div>
+        <div class="chip" data-s="unseen"><span class="g" style="color:var(--cyan)">•</span><b>unseen</b><span>finished or asked something while you were elsewhere</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="keys">
+    <h2>All on <kbd style="font-size:.6em;vertical-align:middle">alt</kbd>.</h2>
+    <p class="sub">Every other key goes straight to the focused agent, including <code>shift+enter</code> for a newline in the Claude and Codex composers.</p>
+    <div class="keys">
+      <div class="key"><kbd>alt+n</kbd><span>new agent: claude, codex, shell, custom</span></div>
+      <div class="key"><kbd>alt+a</kbd><span>next agent that needs you</span></div>
+      <div class="key"><kbd>alt+1…9</kbd><kbd>alt+j/k</kbd><span>jump / next / previous</span></div>
+      <div class="key"><kbd>alt+g</kbd><span>grid ⇄ focus</span></div>
+      <div class="key"><kbd>alt+b</kbd><span>broadcast a prompt</span></div>
+      <div class="key"><kbd>alt+r</kbd><kbd>alt+w</kbd><span>rename / close</span></div>
+      <div class="key"><kbd>alt+s</kbd><span>toggle sidebar</span></div>
+      <div class="key"><kbd>alt+?</kbd><span>all keys</span></div>
+    </div>
+  </section>
+
+  <section id="install">
+    <h2>Get it running.</h2>
+    <p class="sub">Build it with cargo and start it with whatever agents you want.</p>
+    <div class="code">
+<div><span class="p">$ </span>git clone https://github.com/leofle/trix &amp;&amp; cd trix</div>
+<div><span class="p">$ </span>cargo install --path .</div>
+<div> </div>
+<div><span class="p">$ </span>trix                      <span class="cm"># empty workspace, press enter to spawn</span></div>
+<div><span class="p">$ </span>trix claude codex shell   <span class="cm"># start with agents in the current folder</span></div>
+    </div>
+    <div class="envs">
+      <code>TRIX_THEME=path/to/colors.toml</code>
+      <code>TRIX_NO_NOTIFY=1</code>
+      <code>trix hook &lt;source&gt;</code>
+    </div>
+  </section>
+
+  <footer>
+    <img src="favicon.svg" alt="">
+    <span>trix · built in Rust with alacritty_terminal + ratatui</span>
+    <a class="r" href="https://github.com/leofle/trix">github ↗</a>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const SPIN = ['⠋','⠙','⠹','⠸','⠼','⠴','⠦','⠧','⠇','⠏'];
+  const BARS = '▁▂▃▄▅▆▇█';
+  const $ = id => document.getElementById(id);
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+
+  /* ---- mascots ---- */
+  const tpl = $('mascot-tpl');
+  document.querySelectorAll('[data-mascot]').forEach(el => {
+    const svg = tpl.content.firstElementChild.cloneNode(true);
+    svg.id = el.id; el.replaceWith(svg);
+  });
+  const heroM = $('hero-mascot'), stateM = $('state-mascot');
+
+  // eyes follow the pointer
+  addEventListener('pointermove', e => {
+    for (const m of [heroM, stateM]) {
+      const r = m.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height * .53);
+      const d = Math.hypot(dx, dy) || 1, k = Math.min(1, d / 300);
+      m.querySelector('.look').style.transform = `translate(${(dx / d * 5 * k).toFixed(2)}px, ${(dy / d * 3.5 * k).toFixed(2)}px)`;
+    }
+  });
+
+  /* ---- copy buttons ---- */
+  document.querySelectorAll('.copy').forEach(b => b.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = 'copied ✓'; }
+    catch { b.textContent = 'select it'; }
+    setTimeout(() => b.textContent = 'copy', 1600);
+  }));
+
+  /* ---- states section ---- */
+  const chips = [...document.querySelectorAll('.chip')];
+  let chipIdx = 0, chipHover = false;
+  const showChip = s => {
+    chips.forEach(c => c.classList.toggle('on', c.dataset.s === s));
+    stateM.dataset.state = s === 'unseen' ? 'done' : s;
+  };
+  chips.forEach(c => {
+    c.addEventListener('pointerenter', () => { chipHover = true; showChip(c.dataset.s); });
+    c.addEventListener('pointerleave', () => { chipHover = false; });
+  });
+  showChip('working');
+  setInterval(() => { if (!chipHover) showChip(chips[++chipIdx % chips.length].dataset.s); }, 2200);
+
+  /* ---- terminal demo ---- */
+  const fresh = () => [
+    { name: 'web',   kind: 'claude', br: 'main',      dir: '~/code/web',  diff: '+42 −7', st: 'working', act: 'Edit src/app.tsx', t: 134, spark: [1,2,4,6,4,2,1,0,1,4], phase: 0 },
+    { name: 'api',   kind: 'claude', br: 'trix/api',  dir: '~/code/api',  diff: '+8 −2',  st: 'working', act: 'Bash cargo test',  t: 12,  spark: [0,0,0,1,4,0,0,0,0,0], phase: 0 },
+    { name: 'docs',  kind: 'codex',  br: 'trix/docs', dir: '~/code/web',  diff: '+120',   st: 'done',    act: 'turn finished',    t: 48,  spark: [3,2,1,0,0,0,0,0,0,0], phase: 0 },
+    { name: 'shell', kind: 'shell',  br: 'main',      dir: '~/code',      diff: '',       st: 'idle',    act: 'zsh',              t: 301, spark: [0,0,0,0,0,0,0,0,0,0], phase: 0 },
+  ];
+  let A = fresh(), focus = 0, frame = 0, clock = 0;
+
+  const get = n => A.find(a => a.name === n);
+  const set = (n, st, act) => {
+    const a = get(n); a.st = st; a.act = act; a.t = 0; a.phase++;
+    if (A.indexOf(a) !== focus && (st === 'blocked' || st === 'done')) a.unseen = true;
+  };
+  const go = n => { focus = A.indexOf(get(n)); A[focus].unseen = false; };
+  const kf = $('keyflash');
+  const press = (key, fn) => { kf.textContent = key; kf.classList.add('on'); setTimeout(() => { kf.classList.remove('on'); fn(); }, 550); };
+
+  const script = [
+    [3.0,  () => set('api', 'blocked', 'approve Bash rm -rf dist')],
+    [6.5,  () => press('alt+a', () => go('api'))],
+    [9.0,  () => press('1', () => set('api', 'working', 'Bash cargo test'))],
+    [11.0, () => set('web', 'done', 'turn finished')],
+    [12.5, () => set('docs', 'working', 'Write README.md')],
+    [15.5, () => set('api', 'done', 'turn finished')],
+    [17.5, () => press('alt+a', () => go('web'))],
+    [21.5, () => { A = fresh(); focus = 0; clock = 0; }],
+  ];
+
+  const glyph = st => ({
+    working: `<span class="c-work">${SPIN[frame % 10]}</span>`,
+    blocked: `<span class="c-block" style="opacity:${(frame / 6 | 0) % 2 ? .45 : 1}">▲</span>`,
+    done: '<span class="c-done">✓</span>',
+    idle: '<span class="c-idle">○</span>',
+  })[st];
+  const dur = s => s < 60 ? `${s}s` : `${s / 60 | 0}m${String(s % 60).padStart(2, '0')}s`;
+
+  const pane = a => {
+    if (a.name === 'api') {
+      const head = ['<div class="u">clean the build and rerun the tests</div>', '<div></div>'];
+      if (a.st === 'blocked') return [...head,
+        '<div><span class="dotw">●</span> Bash(rm -rf dist)</div>',
+        '<div class="perm"><div class="h">Bash command</div><div>  rm -rf dist</div><div class="fd">  Remove stale build output</div><div></div><div>Do you want to proceed?</div><div class="sel">❯ 1. Yes</div><div>  2. No, and tell Claude what to do differently</div></div>'];
+      return [...head,
+        '<div><span class="dot">●</span> Bash(rm -rf dist)</div>', '<div class="fd">  ⎿  (no output)</div>',
+        `<div><span class="${a.st === 'done' ? 'dot' : 'dotw'}">●</span> Bash(cargo test)</div>`,
+        a.st === 'done' ? '<div class="fd">  ⎿  test result: ok. 48 passed; 0 failed</div>' : `<div class="fd">  ⎿  running 48 tests… ${'.'.repeat(frame / 3 % 4 | 0)}</div>`,
+        '<div></div>',
+        a.st === 'done' ? '<div><span class="dot">●</span> Clean build, all 48 tests pass.</div>' : `<div class="c-work">${SPIN[frame % 10]} Testing… <span class="fd">(${dur(a.t)} · esc to interrupt)</span></div>`];
+    }
+    if (a.name === 'web') return [
+      '<div class="u">make the header sticky and add a theme toggle</div>', '<div></div>',
+      '<div><span class="dot">●</span> Read(src/components/Header.tsx)</div>',
+      '<div><span class="dot">●</span> Edit(src/components/Header.tsx)</div>', '<div class="fd">  ⎿  Updated with 18 additions and 4 removals</div>',
+      `<div><span class="${a.st === 'done' ? 'dot' : 'dotw'}">●</span> Edit(src/app.tsx)</div>`, '<div class="fd">  ⎿  Updated with 24 additions and 3 removals</div>',
+      '<div></div>',
+      a.st === 'done' ? '<div><span class="dot">●</span> Header is sticky and the toggle persists to localStorage.</div>'
+                      : `<div class="c-work">${SPIN[frame % 10]} Editing… <span class="fd">(${dur(a.t)} · esc to interrupt)</span></div>`];
+    return ['<div class="fd">(live agent terminal)</div>'];
+  };
+
+  function render() {
+    const c = { blocked: 0, working: 0, done: 0 };
+    A.forEach(a => c[a.st] !== undefined && c[a.st]++);
+    const hh = new Date(); const time = `${String(hh.getHours()).padStart(2,'0')}:${String(hh.getMinutes()).padStart(2,'0')}`;
+    $('topbar').innerHTML = `<span class="c-acc">◆ <b style="color:#c0caf5">trix</b></span>` +
+      (c.blocked ? `<span class="c-block">▲ ${c.blocked} needs you</span>` : '') +
+      (c.working ? `<span class="c-work">${SPIN[frame % 10]} ${c.working} working</span>` : '') +
+      (c.done ? `<span class="c-done">✓ ${c.done} done</span>` : '') +
+      `<span class="k">focus · ${time}</span>`;
+
+    $('agents').innerHTML = A.map((a, i) => `
+      <div class="ag ${i === focus ? 'sel' : ''} ${a.st === 'blocked' ? 'blk' : ''}">
+        <div class="r1"><span class="n">${i + 1}</span>${glyph(a.st)}<span class="nm">${a.name}</span>${a.unseen ? '<span class="un">•</span>' : ''}<span class="t">${dur(a.t)}</span></div>
+        <div class="r2 ${a.st === 'blocked' ? 'c-block' : ''}">${esc(a.act)}</div>
+        <div class="r3">${a.kind} <span class="sp">${a.spark.map(v => BARS[v]).join('')}</span>  ${a.br}</div>
+      </div>`).join('');
+
+    const f = A[focus];
+    $('ptitle').innerHTML = `${glyph(f.st)}<span class="nm">${f.name}</span><span>${f.kind} · ${esc(f.act)}</span><span class="r">${f.dir}  ${f.br} ${f.diff ? `<span class="c-done">${f.diff.split(' ')[0]}</span> <span class="c-block" style="font-weight:400">${f.diff.split(' ')[1] || ''}</span>` : ''}</span>`;
+    $('lines').innerHTML = pane(f).join('');
+
+    const blk = A.find((a, i) => a.st === 'blocked' && i !== focus);
+    const strip = $('strip');
+    if (blk) strip.innerHTML = `<span>▲ ${blk.name} (${A.indexOf(blk) + 1})</span><span>${esc(blk.act)}</span><span class="k">alt+a  jump</span>`;
+    strip.classList.toggle('on', !!blk);
+
+    // hero mascot mirrors the workspace
+    const s = c.blocked ? 'blocked' : c.working ? 'working' : 'done';
+    heroM.dataset.state = s; $('hero-stage').dataset.state = s;
+    $('bubble').innerHTML = c.blocked ? `<span class="g c-block">▲</span> ${A.find(a => a.st === 'blocked').name} needs you!`
+      : c.working ? `<span class="g c-work">${SPIN[frame % 10]}</span> ${c.working} agent${c.working > 1 ? 's' : ''} working`
+      : `<span class="g c-done">✓</span> all done`;
+  }
+
+  // spinners in the states section
+  const spinEls = document.querySelectorAll('[data-spin]');
+
+  function tick() {
+    frame++;
+    const prev = clock; clock += .09;
+    for (const [at, fn] of script) if (prev < at && clock >= at) fn();
+    if (frame % 11 === 0) {
+      A.forEach(a => {
+        a.t++;
+        const v = a.st === 'working' ? 2 + (Math.random() * 6 | 0) : a.st === 'blocked' ? 0 : Math.max(0, a.spark.at(-1) - 2);
+        a.spark.push(v); a.spark.shift();
+      });
+    }
+    spinEls.forEach(e => e.textContent = SPIN[frame % 10]);
+    render();
+  }
+  render();
+  if (!reduce) setInterval(tick, 90);
+  else { set('api', 'blocked', 'approve Bash rm -rf dist'); render(); }
+})();
+</script>
+</body>
+</html>
