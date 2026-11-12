@@ -320,6 +320,12 @@ kbd { font: 700 13px var(--mono); color: var(--fg-hi); background: var(--surface
 .crew h4 { margin: 0 0 6px; padding: 0 16px; font: 700 11px var(--mono); letter-spacing: .14em; color: var(--dim); }
 .crew .by { color: var(--muted); }
 .toast { margin: 12px 16px 0; padding: 6px 12px; border-radius: 6px; background: var(--surface-hi); border-left: 3px solid var(--accent); color: #c0caf5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.toast.good { border-left-color: var(--done); }
+.toast.bad { border-left-color: var(--block); white-space: normal; }
+.reload { display: flex; flex-direction: column; justify-content: center; }
+.reload .step { margin: 18px 16px 0; color: var(--dim); font-size: 12px; }
+.reload .step:first-of-type { margin-top: 4px; }
+.reload .toast { margin-top: 6px; }
 .code .o { color: #c0caf5; }
 .rails { margin-top: 14px; }
 .rails .card h3 { font-size: 16px; }
@@ -387,6 +393,7 @@ footer .r { margin-left: auto; }
       <a href="#control">control</a>
       <a href="#search">search</a>
       <a href="#sessions">sessions</a>
+      <a href="#config">config</a>
       <a href="#keys">keys</a>
       <a href="#install">install</a>
       <a class="gh" href="https://github.com/leofle/trix">github ↗</a>
@@ -431,7 +438,7 @@ footer .r { margin-left: auto; }
     <p class="sub">tmux and zellij don't know anything about agents. Other tools treat the agent as just another pane. trix is built around what each agent is doing.</p>
     <div class="grid">
       <div class="card"><div class="ic c-acc">⚓</div><h3>Hooks first, guessing second</h3><p>Claude Code, Codex, OpenCode and Cursor report their own lifecycle: prompts, each tool call, permission requests, finished and interrupted turns. Your agent configs are never touched.</p></div>
-      <div class="card"><div class="ic c-block">▲</div><h3>Feedback you can't miss</h3><p>A red strip over your current pane, a desktop notification, a terminal bell, a rising chime when unseen work finishes, and a live title count. Each agent shows a sparkline, its branch and its diff so far.</p></div>
+      <div class="card"><div class="ic c-block">▲</div><h3>Feedback you can't miss</h3><p>A red strip over your current pane, a desktop notification, a terminal bell, a rising chime when unseen work finishes, and a live title count, each one yours to switch. Each agent shows a sparkline, its branch and its diff so far.</p></div>
       <div class="card"><div class="ic c-work">⌥</div><h3>One key to what matters</h3><p><code>alt+a</code> goes to the agent that has been blocked longest, then to finished work you haven't seen yet.</p></div>
       <div class="card"><div class="ic c-start">▦</div><h3>Every agent at once</h3><p><code>alt+g</code> tiles all agents live. Blocked tiles turn red and the rest fade back a little.</p></div>
       <div class="card"><div class="ic c-work">◔</div><h3>Context at a glance</h3><p>Each Claude and Codex pane shows how full its context window is, read from the agent's own log: <code>context 31% · ~138k left</code>. It turns yellow at 70% and red at 85%.</p></div>
@@ -477,7 +484,7 @@ footer .r { margin-left: auto; }
 
   <section id="control">
     <h2>Agents can run agents.</h2>
-    <p class="sub"><code>trix spawn</code>, <code>send</code>, <code>read</code>, <code>wait</code> and <code>close</code> let a script, or an agent in another pane, work the workspace the way you do. A lead Claude can start workers in their own worktrees, hand them tasks, wait for them and read what they did.</p>
+    <p class="sub"><code>trix spawn</code>, <code>send</code>, <code>read</code>, <code>wait</code>, <code>close</code> and <code>events</code> let a script, or an agent in another pane, work the workspace the way you do. A lead Claude can start workers in their own worktrees, hand them tasks, wait for them and read what they did.</p>
     <div class="persist">
       <div class="code" aria-label="Agent control commands">
 <div><span class="p">$ </span>trix spawn claude --name api --worktree \</div>
@@ -491,6 +498,10 @@ footer .r { margin-left: auto; }
 <div><span class="p">$ </span>trix ls --json           <span class="cm"># state, activity, branch, diff…</span></div>
 <div><span class="p">$ </span>trix close api</div>
 <div><span class="o">closed api</span></div>
+<div><span class="p">$ </span>trix events api auth     <span class="cm"># follow them live (--json for scripts)</span></div>
+<div><span class="o">10:21:03  api            <span class="w">working             </span>  Edit src/limit.rs</span></div>
+<div><span class="o">10:21:03  auth           <span class="d">done                </span>  turn finished</span></div>
+<div><span class="o">10:22:41  api            <span class="b">working → needs-you </span>  approve Bash rm -rf dist</span></div>
       </div>
       <div class="crew" aria-label="The trix sidebar with a lead agent driving two workers">
         <h4>AGENTS  3</h4>
@@ -515,7 +526,7 @@ footer .r { margin-left: auto; }
     <div class="grid rails">
       <div class="card"><div class="ic c-block">▲</div><h3>Never answers for you</h3><p><code>send</code> refuses an agent that needs you, since its Enter would answer the prompt. Answering prompts is left to you on purpose.</p></div>
       <div class="card"><div class="ic c-acc">‹</div><h3>You can see who drives</h3><p>Every <code>send</code> shows a toast, and agents another agent started or prompted show <code>‹lead</code> next to their name.</p></div>
-      <div class="card"><div class="ic c-work">⏎</div><h3>Built for scripts</h3><p><code>wait</code> prints <code>name state activity</code> lines, <code>ls --json</code> has every detail (context included), and exit codes say what happened (124: timed out, run it again).</p></div>
+      <div class="card"><div class="ic c-work">⏎</div><h3>Built for scripts</h3><p><code>wait</code> prints <code>name state activity</code> lines, <code>events --json</code> streams every change, <code>ls --json</code> has every detail (context included), and exit codes say what happened.</p></div>
     </div>
   </section>
 
@@ -598,9 +609,47 @@ footer .r { margin-left: auto; }
     <p class="under">Plain TOML, meant to be edited by hand or by an agent. From inside a pane, an agent can open one for you too.</p>
   </section>
 
+  <section id="config">
+    <h2>Make it yours.</h2>
+    <p class="sub">One optional file, <code>~/.config/trix/config.toml</code>, changes keys, notifications and sounds. trix reloads it within a second of each save, and <code>trix config</code> checks it from the command line.</p>
+    <div class="persist">
+      <div class="code toml" aria-label="A sample trix config file">
+<div class="fname"># ~/.config/trix/config.toml</div>
+<div><span class="h">[keys]</span></div>
+<div><span class="k">new</span>  = <span class="s">"alt+t"</span>                   <span class="cm"># one key…</span></div>
+<div><span class="k">next</span> = [<span class="s">"alt+j"</span>, <span class="s">"ctrl+down"</span>]    <span class="cm"># …or several</span></div>
+<div><span class="k">jump</span> = <span class="s">"ctrl+1..9"</span></div>
+<div> </div>
+<div><span class="h">[notify]</span></div>
+<div><span class="k">on</span>      = [<span class="s">"needs-you"</span>]          <span class="cm"># needs-you, done</span></div>
+<div><span class="k">bell</span>    = false</div>
+<div><span class="k">command</span> = <span class="s">"~/bin/ping-phone"</span>     <span class="cm"># gets the event as JSON</span></div>
+<div> </div>
+<div><span class="h">[sound]</span></div>
+<div><span class="k">done</span>      = <span class="s">"chime"</span>              <span class="cm"># built in, "off" or a file</span></div>
+<div><span class="k">needs_you</span> = <span class="s">"~/sounds/knock.ogg"</span></div>
+<div><span class="k">mute</span>      = [<span class="s">"codex"</span>, <span class="s">"scratch"</span>] <span class="cm"># kinds or names</span></div>
+      </div>
+      <div class="crew reload" aria-label="The toasts trix shows as the config file is saved">
+        <h4>EACH TIME YOU SAVE</h4>
+        <div class="step">saved</div>
+        <div class="toast good">config reloaded</div>
+        <div class="step">saved with a mistake</div>
+        <div class="toast bad">config: alt+a is bound to both new and attention — kept the previous settings</div>
+        <div class="step">fixed</div>
+        <div class="toast good">config OK again</div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="ic c-acc">⌥</div><h3>Your keys</h3><p>Rebind any workspace key, or give it several. Each needs <code>alt</code> or <code>ctrl</code>, so it can't swallow what you type into agents. The footer and help show the keys you chose.</p></div>
+      <div class="card"><div class="ic c-block">▲</div><h3>Your notifications</h3><p>Pick which events notify and where: the desktop, the bell, or a command of your own that gets the event as JSON. One <code>curl</code> to ntfy puts them on your phone.</p></div>
+      <div class="card"><div class="ic c-done">♪</div><h3>Your sounds</h3><p>The built-in chime, a needs-you sound, or files of your own, each on or off. Mute an agent kind or a single agent by name.</p></div>
+    </div>
+  </section>
+
   <section id="keys">
     <h2>All on <kbd style="font-size:.6em;vertical-align:middle">alt</kbd>.</h2>
-    <p class="sub">Every other key goes straight to the focused agent, including <code>shift+enter</code> for a newline in the Claude and Codex composers.</p>
+    <p class="sub">Every other key goes straight to the focused agent, including <code>shift+enter</code> for a newline in the Claude and Codex composers. Any of these can be rebound in <a href="#config">config.toml</a>.</p>
     <div class="keys">
       <div class="key"><kbd>alt+n</kbd><span>new agent: any kind, folder, first prompt</span></div>
       <div class="key"><kbd>alt+a</kbd><span>next agent that needs you</span></div>
@@ -608,7 +657,8 @@ footer .r { margin-left: auto; }
       <div class="key"><kbd>alt+g</kbd><span>grid ⇄ focus</span></div>
       <div class="key"><kbd>alt+b</kbd><span>broadcast a prompt</span></div>
       <div class="key"><kbd>alt+f</kbd><span>search every agent's scrollback</span></div>
-      <div class="key"><kbd>alt+r</kbd><kbd>alt+w</kbd><span>rename / close</span></div>
+      <div class="key"><kbd>alt+r</kbd><kbd>alt+w</kbd><span>rename (or double-click it) / close</span></div>
+      <div class="key"><kbd>alt+o</kbd><span>agent menu (or right-click)</span></div>
       <div class="key"><kbd>alt+d</kbd><span>detach (agents keep running)</span></div>
       <div class="key"><kbd>alt+s</kbd><span>toggle sidebar</span></div>
       <div class="key"><kbd>alt+m</kbd><span>mini sidebar, one line per agent</span></div>
@@ -630,6 +680,7 @@ footer .r { margin-left: auto; }
 <div><span class="p">$ </span>trix attach               <span class="cm"># attach only; fails if nothing is running</span></div>
 <div><span class="p">$ </span>trix view                 <span class="cm"># watch read-only from another terminal (q leaves)</span></div>
 <div><span class="p">$ </span>trix ls                   <span class="cm"># agents and states, without attaching</span></div>
+<div><span class="p">$ </span>trix config               <span class="cm"># check ~/.config/trix/config.toml</span></div>
 <div><span class="p">$ </span>trix kill                 <span class="cm"># stop the workspace and every agent in it</span></div>
 <div> </div>
 <div><span class="p">$ </span>trix -s work              <span class="cm"># the same, for a named session</span></div>
