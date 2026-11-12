@@ -275,10 +275,45 @@ kbd { font: 700 13px var(--mono); color: var(--fg-hi); background: var(--surface
 .restore { display: grid; place-items: center; padding: 28px 18px; background: #1a1b26; border: 1px solid var(--line); border-radius: 14px; }
 .modal { width: 100%; max-width: 420px; border: 1px solid var(--accent); border-radius: 8px; padding: 0 16px 16px; font-size: 13px; text-align: center; }
 .modal .ttl { display: inline-block; transform: translateY(-50%); background: #1a1b26; padding: 0 8px; color: var(--accent); font-weight: 700; }
-.modal p { margin: 4px 0 18px; color: #c0caf5; text-wrap: balance; }
+.modal p { margin: 4px 0 18px; color: #c0caf5; }
+.modal p span { white-space: nowrap; }
 .modal .opts { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px 14px; color: var(--fg); }
 .modal .opts b { padding: 0 6px; margin-right: 6px; background: var(--surface-hi); color: var(--fg-hi); border-radius: 3px; }
 .modal .opts b.y { background: var(--done); color: #1a1b26; }
+
+.grid.g2 { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 600px) { .grid.g2 { grid-template-columns: 1fr; } }
+
+/* search */
+.srch { background: #1a1b26; border: 1px solid var(--line); border-radius: 14px; padding: 26px 18px 18px; font-size: 13px; }
+.srch .box { border: 1px solid var(--accent); border-radius: 8px; padding: 0 18px 12px; min-width: 0; }
+.srch .sc { overflow-x: auto; }
+.srch .ttl { display: inline-block; transform: translateY(-50%); background: #1a1b26; padding: 0 8px; color: var(--accent); font-weight: 700; }
+.srch .q { display: flex; gap: 16px; margin: 0 0 14px; white-space: nowrap; }
+.srch .q .c { margin-left: auto; color: var(--dim); }
+.srch .q b { color: var(--accent); font-weight: 400; }
+.srch .cur { display: inline-block; width: .6em; height: 1.15em; vertical-align: -.2em; background: #c0caf5; animation: caret 1s steps(1) infinite; }
+@keyframes caret { 50% { opacity: 0; } }
+.srch .hit { white-space: pre; padding: 0 4px; margin: 0 -4px; border-radius: 3px; }
+.srch .hit.on { background: var(--surface-hi); color: var(--fg-hi); }
+.srch .hit .m { color: #1a1b26; background: var(--accent); font-weight: 700; }
+.srch .ft { margin-top: 14px; text-align: right; color: var(--dim); white-space: nowrap; }
+.srch .ft b { color: var(--accent); }
+.srch .ft span { color: var(--fg); }
+.k-claude { color: #ff9e64; } .k-codex { color: var(--cyan); }
+/* agent control */
+.crew { background: #1a1b26; border: 1px solid var(--line); border-radius: 14px; padding: 12px 0 16px; font-size: 13.5px; line-height: 1.55; position: relative; min-width: 0; }
+.crew h4 { margin: 0 0 6px; padding: 0 16px; font: 700 11px var(--mono); letter-spacing: .14em; color: var(--dim); }
+.crew .by { color: var(--muted); }
+.toast { margin: 12px 16px 0; padding: 6px 12px; border-radius: 6px; background: var(--surface-hi); border-left: 3px solid var(--accent); color: #c0caf5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.code .o { color: #c0caf5; }
+.rails { margin-top: 14px; }
+.rails .card h3 { font-size: 16px; }
+.fname { color: var(--dim); }
+.toml .k { color: var(--accent); } .toml .s { color: var(--done); } .toml .h { color: var(--mag); }
+
+.codex-note { margin-top: 16px; font-size: 13.5px; color: var(--dim); }
+.codex-note code { color: var(--cyan); }
 
 footer { margin-top: 110px; padding: 30px 0 40px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--dim); }
 footer img { width: 26px; }
@@ -334,6 +369,8 @@ footer .r { margin-left: auto; }
     <div class="navlinks">
       <a href="#features">features</a>
       <a href="#states">states</a>
+      <a href="#control">control</a>
+      <a href="#search">search</a>
       <a href="#sessions">sessions</a>
       <a href="#keys">keys</a>
       <a href="#install">install</a>
@@ -377,8 +414,8 @@ footer .r { margin-left: auto; }
     <h2>The agent comes first.</h2>
     <p class="sub">tmux and zellij don't know anything about agents. Other tools treat the agent as just another pane. trix is built around what each agent is doing.</p>
     <div class="grid">
-      <div class="card"><div class="ic c-acc">⚓</div><h3>Hooks first, guessing second</h3><p>Claude Code and Codex report their own lifecycle: prompts, tool calls, permission requests, finished turns. Your agent configs are never touched.</p></div>
-      <div class="card"><div class="ic c-block">▲</div><h3>Feedback you can't miss</h3><p>A red strip over your current pane, a desktop notification, a terminal bell and a live title count. Each agent shows a sparkline, its branch and its diff so far.</p></div>
+      <div class="card"><div class="ic c-acc">⚓</div><h3>Hooks first, guessing second</h3><p>Claude Code and Codex report their own lifecycle: prompts, each tool call, permission requests, finished and interrupted turns. Your agent configs are never touched.</p></div>
+      <div class="card"><div class="ic c-block">▲</div><h3>Feedback you can't miss</h3><p>A red strip over your current pane, a desktop notification, a terminal bell, a rising chime when unseen work finishes, and a live title count. Each agent shows a sparkline, its branch and its diff so far.</p></div>
       <div class="card"><div class="ic c-work">⌥</div><h3>One key to what matters</h3><p><code>alt+a</code> goes to the agent that has been blocked longest, then to finished work you haven't seen yet.</p></div>
       <div class="card"><div class="ic c-start">▦</div><h3>Every agent at once</h3><p><code>alt+g</code> tiles all agents live. Blocked tiles turn red and the rest fade back a little.</p></div>
       <div class="card"><div class="ic c-done">⑂</div><h3>Worktrees built in</h3><p>Each agent can get its own <code>trix/&lt;name&gt;</code> branch in a git worktree, so parallel agents never step on each other.</p></div>
@@ -401,13 +438,77 @@ footer .r { margin-left: auto; }
     </div>
   </section>
 
+  <section id="control">
+    <h2>Agents can run agents.</h2>
+    <p class="sub"><code>trix spawn</code>, <code>send</code>, <code>read</code>, <code>wait</code> and <code>close</code> let a script, or an agent in another pane, work the workspace the way you do. A lead Claude can start workers in their own worktrees, hand them tasks, wait for them and read what they did.</p>
+    <div class="persist">
+      <div class="code" aria-label="Agent control commands">
+<div><span class="p">$ </span>trix spawn claude --name api --worktree \</div>
+<div>    --prompt "add rate limiting to /login"</div>
+<div><span class="o">api	~/code/web/.trix/worktrees/api</span></div>
+<div><span class="p">$ </span>trix send api "also cover it with a test"</div>
+<div><span class="o">sent to api</span></div>
+<div><span class="p">$ </span>trix wait api            <span class="cm"># blocks until api stops working</span></div>
+<div><span class="o">api	done	turn finished</span></div>
+<div><span class="p">$ </span>trix read api -n 80      <span class="cm"># its last 80 lines</span></div>
+<div><span class="p">$ </span>trix ls --json           <span class="cm"># state, activity, branch, diff…</span></div>
+<div><span class="p">$ </span>trix close api</div>
+<div><span class="o">closed api</span></div>
+      </div>
+      <div class="crew" aria-label="The trix sidebar with a lead agent driving two workers">
+        <h4>AGENTS  3</h4>
+        <div class="ag sel">
+          <div class="r1"><span class="n">1</span><span class="c-work" data-spin>⠹</span><span class="nm">lead</span><span class="t">4m02s</span></div>
+          <div class="r2">Bash trix wait api auth -t 280</div>
+          <div class="r3">claude <span class="sp">▁▂▁▁▁▂▁▁</span>  main</div>
+        </div>
+        <div class="ag">
+          <div class="r1"><span class="n">2</span><span class="c-work" data-spin>⠹</span><span class="nm">api</span><span class="by">‹lead</span><span class="t">1m37s</span></div>
+          <div class="r2">Edit src/limit.rs</div>
+          <div class="r3">claude <span class="sp">▅▇▅▃▅▇▆▃</span>  trix/api</div>
+        </div>
+        <div class="ag">
+          <div class="r1"><span class="n">3</span><span class="c-done">✓</span><span class="nm">auth</span><span class="un">•</span><span class="by">‹lead</span><span class="t">12s</span></div>
+          <div class="r2">turn finished</div>
+          <div class="r3">claude <span class="sp">▅▃▂▁▁▁▁▁</span>  trix/auth</div>
+        </div>
+        <div class="toast">lead → api: also cover it with a test</div>
+      </div>
+    </div>
+    <div class="grid rails">
+      <div class="card"><div class="ic c-block">▲</div><h3>Never answers for you</h3><p><code>send</code> refuses an agent that needs you, since its Enter would answer the prompt. Answering prompts is left to you on purpose.</p></div>
+      <div class="card"><div class="ic c-acc">‹</div><h3>You can see who drives</h3><p>Every <code>send</code> shows a toast, and agents another agent started or prompted show <code>‹lead</code> next to their name.</p></div>
+      <div class="card"><div class="ic c-work">⏎</div><h3>Built for scripts</h3><p><code>wait</code> prints <code>name state activity</code> lines, <code>ls --json</code> has every detail, and exit codes say what happened (124: timed out, run it again).</p></div>
+    </div>
+  </section>
+
+  <section id="search">
+    <h2>Search every agent at once.</h2>
+    <p class="sub"><code>alt+f</code> searches every agent's scrollback as you type, newest first, grouped by agent. <code>enter</code> focuses that agent, scrolls to the line and selects the match.</p>
+    <div class="srch" aria-label="The trix search panel with results from three agents">
+      <div class="box">
+        <span class="ttl">Search every agent</span>
+        <div class="sc">
+        <div class="q"><span><b>›</b> timeout<span class="cur"></span></span><span class="c">5 lines · 3 agents</span></div>
+<div class="hit on"><span class="c-acc">▸ </span><span class="k-claude">web </span>  <span class="fd">on screen</span>  ✗ fetch user › request <span class="m">timeout</span> after 30000ms</div>
+<div class="hit">  <span class="k-claude">web </span>       <span class="fd">↑340</span>  vitest: test <span class="m">timeout</span> raised to 10s in vitest.config.ts</div>
+<div class="hit">  <span class="k-claude">api </span>       <span class="fd">↑128</span>  thread 'pool::tests::acquire' panicked: connection <span class="m">timeout</span></div>
+<div class="hit">  <span class="k-claude">api </span>      <span class="fd">↑2.1k</span>  + const POOL_<span class="m">TIMEOUT</span>: Duration = Duration::from_secs(5);</div>
+<div class="hit">  <span class="k-codex">docs</span>        <span class="fd">↑86</span>  - `<span class="m">timeout</span>`: seconds before a request is abandoned</div>
+        <div class="ft"><span>↑↓</span> select   <b>enter</b> jump   <span>esc</span> close</div>
+        </div>
+      </div>
+    </div>
+    <p class="under">Smart case: lowercase ignores case, any capital matches exactly. Lines that wrapped on screen are searched as one.</p>
+  </section>
+
   <section id="sessions">
     <h2>Close the window. Keep the agents.</h2>
     <p class="sub">The workspace runs in a background server. Closing the terminal, losing SSH or pressing <code>alt+d</code> only detaches. Agents keep working, and they still notify you on the desktop.</p>
     <div class="persist">
       <div class="code" aria-label="Example output of trix ls">
 <div><span class="p">$ </span>trix ls</div>
-<div><span class="hd">trix · 3 agents · <span class="b">1 needs you</span> · <span class="w">1 working</span> · <span class="d">1 done</span></span></div>
+<div><span class="hd">trix · 3 agents · <span class="b">1 needs you</span> · <span class="w">1 working</span> · <span class="d">1 done</span> · 1 watching</span></div>
 <div> 1   web   claude  <span class="w">working  </span>  2m14s  Edit src/app.tsx  ~/code/web</div>
 <div> 2 <span class="un">•</span> api   claude  <span class="b">needs you</span>    12s  approve Bash rm -rf dist  ~/code/api</div>
 <div> 3 <span class="un">•</span> docs  codex   <span class="d">done     </span>    48s  turn finished  ~/code/web</div>
@@ -419,16 +520,45 @@ footer .r { margin-left: auto; }
       <div class="restore" aria-label="The restore prompt trix shows after a restart">
         <div class="modal">
           <span class="ttl">Pick up where you left off?</span>
-          <p>3 agents from your last session · 2 conversations resume</p>
+          <p><span>3 agents from your last session ·</span> <span>2 conversations resume</span></p>
           <div class="opts"><span><b class="y">y</b>restore</span><span><b>n</b>start fresh</span><span><b>esc</b>later</span></div>
         </div>
       </div>
     </div>
-    <div class="grid">
+    <div class="grid g2">
       <div class="card"><div class="ic c-acc">⇢</div><h3>Detach and attach</h3><p>Run <code>trix</code> again from any terminal to pick up where you were, scrollback included. <code>trix ls</code> shows who needs you without attaching.</p></div>
       <div class="card"><div class="ic c-done">↻</div><h3>Survives restarts</h3><p>The workspace is saved as it changes. After a crash, a reboot or <code>trix kill</code>, Claude and Codex resume the exact conversation each pane was in, and shells reopen in their folder.</p></div>
       <div class="card"><div class="ic" style="color:var(--mag)">◇</div><h3>Named sessions</h3><p><code>trix -s work</code> and <code>trix -s home</code> are separate workspaces, each with its own agents, saved layout and attached terminal.</p></div>
+      <div class="card"><div class="ic c-start">◉</div><h3>Watch without taking over</h3><p><code>trix view</code> attaches read-only from any number of other terminals: a second monitor, a laptop over SSH, a teammate on the same box. Nothing a viewer types reaches an agent.</p></div>
     </div>
+  </section>
+
+  <section id="layouts">
+    <h2>Your usual tabs, on demand.</h2>
+    <p class="sub">A layout is a named set of tabs to open whenever you like: the three repos you always work in, a shell per service, a dev server. Opening one adds to the workspace you're in, skips tabs already open and never steals focus. Unlike restore, it stays until you remove it.</p>
+    <div class="persist">
+      <div class="code" aria-label="Layout commands">
+<div><span class="p">$ </span>trix layout save work            <span class="cm"># the tabs open now</span></div>
+<div><span class="p">$ </span>trix layout open work            <span class="cm"># fresh conversations</span></div>
+<div><span class="p">$ </span>trix layout open work --resume   <span class="cm"># …or the saved ones</span></div>
+<div><span class="p">$ </span>trix layout ls</div>
+<div><span class="p">$ </span>trix layout rm work</div>
+      </div>
+      <div class="code toml" aria-label="A saved layout file">
+<div class="fname"># ~/.config/trix/layouts/work.toml</div>
+<div><span class="h">[[agent]]</span></div>
+<div><span class="k">kind</span> = <span class="s">"claude"</span></div>
+<div><span class="k">name</span> = <span class="s">"api"</span></div>
+<div><span class="k">cwd</span>  = <span class="s">"~/code/api"</span></div>
+<div><span class="k">args</span> = <span class="s">"--model opus"</span></div>
+<div> </div>
+<div><span class="h">[[agent]]</span></div>
+<div><span class="k">kind</span> = <span class="s">"shell"</span></div>
+<div><span class="k">name</span> = <span class="s">"dev"</span></div>
+<div><span class="k">cwd</span>  = <span class="s">"~/code/web"</span></div>
+      </div>
+    </div>
+    <p class="under">Plain TOML, meant to be edited by hand or by an agent. From inside a pane, an agent can open one for you too.</p>
   </section>
 
   <section id="keys">
@@ -440,9 +570,11 @@ footer .r { margin-left: auto; }
       <div class="key"><kbd>alt+1…9</kbd><kbd>alt+j/k</kbd><span>jump / next / previous</span></div>
       <div class="key"><kbd>alt+g</kbd><span>grid ⇄ focus</span></div>
       <div class="key"><kbd>alt+b</kbd><span>broadcast a prompt</span></div>
+      <div class="key"><kbd>alt+f</kbd><span>search every agent's scrollback</span></div>
       <div class="key"><kbd>alt+r</kbd><kbd>alt+w</kbd><span>rename / close</span></div>
       <div class="key"><kbd>alt+d</kbd><span>detach (agents keep running)</span></div>
       <div class="key"><kbd>alt+s</kbd><span>toggle sidebar</span></div>
+      <div class="key"><kbd>alt+m</kbd><span>mini sidebar, one line per agent</span></div>
       <div class="key"><kbd>alt+?</kbd><span>all keys</span></div>
       <div class="key"><kbd>alt+q</kbd><span>quit (stops every agent)</span></div>
     </div>
@@ -450,14 +582,15 @@ footer .r { margin-left: auto; }
 
   <section id="install">
     <h2>Get it running.</h2>
-    <p class="sub">Build it with cargo and start it with whatever agents you want.</p>
+    <p class="sub">Runs on Linux and macOS. Build it with <a href="https://rustup.rs">Rust</a> and start it with whatever agents you want.</p>
     <div class="code">
-<div><span class="p">$ </span>git clone https://github.com/leofle/trix &amp;&amp; cd trix</div>
+<div><span class="p">$ </span>git clone https://github.com/leofle/trix.git &amp;&amp; cd trix</div>
 <div><span class="p">$ </span>cargo install --path .</div>
 <div> </div>
 <div><span class="p">$ </span>trix                      <span class="cm"># open the workspace, or attach to the running one</span></div>
 <div><span class="p">$ </span>trix claude codex shell   <span class="cm"># …and start these agents in the current folder</span></div>
 <div><span class="p">$ </span>trix attach               <span class="cm"># attach only; fails if nothing is running</span></div>
+<div><span class="p">$ </span>trix view                 <span class="cm"># watch read-only from another terminal (q leaves)</span></div>
 <div><span class="p">$ </span>trix ls                   <span class="cm"># agents and states, without attaching</span></div>
 <div><span class="p">$ </span>trix kill                 <span class="cm"># stop the workspace and every agent in it</span></div>
 <div> </div>
@@ -467,13 +600,16 @@ footer .r { margin-left: auto; }
     <div class="envs">
       <code>TRIX_THEME=path/to/colors.toml</code>
       <code>TRIX_NO_NOTIFY=1</code>
+      <code>TRIX_NO_SOUND=1</code>
       <code>trix hook &lt;source&gt;</code>
     </div>
+    <p class="codex-note">Using Codex? Open a Codex pane, type <code>/hooks</code> and trust trix's eight hooks once. From then on every Codex pane shows live detail like <code>exec_command cargo test</code> and <code>apply_patch app.rs</code>, just like Claude.</p>
+    <p class="codex-note">On a Mac? Every trix key is <code>alt+…</code>, so set your terminal's Option key to send Alt: <code>macos-option-as-alt = true</code> in Ghostty, Left Option as <code>Esc+</code> in iTerm2, "Use Option as Meta key" in Terminal.app.</p>
   </section>
 
   <footer>
     <img src="favicon.svg" alt="">
-    <span>trix · built in Rust with alacritty_terminal + ratatui</span>
+    <span>trix · built in Rust with alacritty_terminal + ratatui · MIT licensed</span>
     <a class="r" href="https://github.com/leofle/trix">github ↗</a>
   </footer>
 </div>
@@ -527,10 +663,10 @@ footer .r { margin-left: auto; }
 
   /* ---- terminal demo ---- */
   const fresh = () => [
-    { name: 'web',   kind: 'claude', br: 'main',      dir: '~/code/web',  diff: '+42 −7', st: 'working', act: 'Edit src/app.tsx', t: 134, spark: [1,2,4,6,4,2,1,0,1,4], phase: 0 },
-    { name: 'api',   kind: 'claude', br: 'trix/api',  dir: '~/code/api',  diff: '+8 −2',  st: 'working', act: 'Bash cargo test',  t: 12,  spark: [0,0,0,1,4,0,0,0,0,0], phase: 0 },
-    { name: 'docs',  kind: 'codex',  br: 'trix/docs', dir: '~/code/web',  diff: '+120',   st: 'done',    act: 'turn finished',    t: 48,  spark: [3,2,1,0,0,0,0,0,0,0], phase: 0 },
-    { name: 'shell', kind: 'shell',  br: 'main',      dir: '~/code',      diff: '',       st: 'idle',    act: 'zsh',              t: 301, spark: [0,0,0,0,0,0,0,0,0,0], phase: 0 },
+    { name: 'web',   kind: 'claude', br: 'main',      dir: '~/code/web',  diff: '+42 −7', st: 'working', act: 'Edit src/app.tsx', t: 134, spark: [2,4,6,4,2,1,0,4], phase: 0 },
+    { name: 'api',   kind: 'claude', br: 'trix/api',  dir: '~/code/api',  diff: '+8 −2',  st: 'working', act: 'Bash cargo test',  t: 12,  spark: [0,0,1,4,0,0,0,0], phase: 0 },
+    { name: 'docs',  kind: 'codex',  br: 'trix/docs', dir: '~/code/web',  diff: '+120',   st: 'done',    act: 'turn finished',    t: 48,  spark: [3,2,1,0,0,0,0,0], phase: 0 },
+    { name: 'shell', kind: 'shell',  br: 'main',      dir: '~/code',      diff: '',       st: 'idle',    act: 'zsh',              t: 301, spark: [0,0,0,0,0,0,0,0], phase: 0 },
   ];
   let A = fresh(), focus = 0, frame = 0, clock = 0;
 
@@ -548,7 +684,7 @@ footer .r { margin-left: auto; }
     [6.5,  () => press('alt+a', () => go('api'))],
     [9.0,  () => press('1', () => set('api', 'working', 'Bash cargo test'))],
     [11.0, () => set('web', 'done', 'turn finished')],
-    [12.5, () => set('docs', 'working', 'Write README.md')],
+    [12.5, () => set('docs', 'working', 'apply_patch README.md')],
     [15.5, () => set('api', 'done', 'turn finished')],
     [17.5, () => press('alt+a', () => go('web'))],
     [21.5, () => { A = fresh(); focus = 0; clock = 0; }],
