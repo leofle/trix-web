@@ -315,6 +315,8 @@ kbd { font: 700 13px var(--mono); color: var(--fg-hi); background: var(--surface
 .tbl td:first-child { white-space: nowrap; }
 .tbl td code { color: var(--cyan); font-size: .95em; }
 .tbl small { display: block; color: var(--dim); font-size: 12px; margin-top: 2px; }
+.h3x { font: 700 24px/1.2 var(--display); color: var(--fg-hi); letter-spacing: -.02em; margin: 64px 0 10px; }
+.code .tx { color: var(--fg-hi); font-weight: 700; }
 /* agent control */
 .crew { background: #1a1b26; border: 1px solid var(--line); border-radius: 14px; padding: 12px 0 16px; font-size: 13.5px; line-height: 1.55; position: relative; min-width: 0; }
 .crew h4 { margin: 0 0 6px; padding: 0 16px; font: 700 11px var(--mono); letter-spacing: .14em; color: var(--dim); }
@@ -440,7 +442,7 @@ footer .r { margin-left: auto; }
       <div class="card"><div class="ic c-acc">⚓</div><h3>Hooks first, guessing second</h3><p>Claude Code, Codex, OpenCode and Cursor report their own lifecycle: prompts, each tool call, permission requests, finished and interrupted turns. Your agent configs are never touched.</p></div>
       <div class="card"><div class="ic c-block">▲</div><h3>Feedback you can't miss</h3><p>A red strip over your current pane, a desktop notification, a terminal bell, a rising chime when unseen work finishes, and a live title count, each one yours to switch. Each agent shows a sparkline, its branch and its diff so far.</p></div>
       <div class="card"><div class="ic c-work">⌥</div><h3>One key to what matters</h3><p><code>alt+a</code> goes to the agent that has been blocked longest, then to finished work you haven't seen yet.</p></div>
-      <div class="card"><div class="ic c-start">▦</div><h3>Every agent at once</h3><p><code>alt+g</code> tiles all agents live. Blocked tiles turn red and the rest fade back a little.</p></div>
+      <div class="card"><div class="ic c-start">▦</div><h3>Many agents, one glance</h3><p><code>alt+g</code> tiles your agents live, up to four a page, two to a row. With more, it shows the focused agent's page. Blocked tiles turn red and the rest fade back a little.</p></div>
       <div class="card"><div class="ic c-work">◔</div><h3>Context at a glance</h3><p>Each Claude and Codex pane shows how full its context window is, read from the agent's own log: <code>context 31% · ~138k left</code>. It turns yellow at 70% and red at 85%.</p></div>
       <div class="card"><div class="ic c-acc">⇉</div><h3>Broadcast, safely</h3><p><code>alt+b</code> sends one prompt to every agent, or only the idle and done ones. Agents sitting on a prompt are skipped, so a broadcast never answers a permission dialog.</p></div>
       <div class="card"><div class="ic c-done">⑂</div><h3>Worktrees built in</h3><p>Each agent can get its own <code>trix/&lt;name&gt;</code> branch in a git worktree, so parallel agents never step on each other.</p></div>
@@ -451,20 +453,59 @@ footer .r { margin-left: auto; }
 
   <section id="supported">
     <h2>Bring your agent.</h2>
-    <p class="sub">trix starts each agent itself and passes what it needs to that one process, so nothing is installed into your agent configs. All five resume their conversation after a restart. Have them installed and logged in first.</p>
+    <p class="sub">trix starts each agent itself and passes what it needs to that one process, so your agent configs are never touched. All five resume their conversation after a restart, and one you don't have yet <a href="#not-installed">installs in its own pane</a> the first time you start it.</p>
     <div class="tbl">
       <table>
         <thead><tr><th>agent</th><th>live state from</th><th>needs you from</th><th>resume</th></tr></thead>
         <tbody>
           <tr><td><b class="k-claude">claude</b></td><td>hooks, through a <code>--settings</code> overlay</td><td><code>PermissionRequest</code> and <code>AskUserQuestion</code> hooks</td><td><code>--resume &lt;id&gt;</code></td></tr>
-          <tr><td><b class="k-codex">codex</b></td><td>hooks through <code>-c</code> (trusted once), plus <code>notify</code></td><td><code>PermissionRequest</code> hook</td><td><code>codex resume &lt;id&gt;</code></td></tr>
+          <tr><td><b class="k-codex">codex</b></td><td>hooks through <code>-c</code> (trusted once), plus <code>notify</code></td><td><code>PermissionRequest</code> hook<small>and its trust and hooks-review dialogs on screen</small></td><td><code>codex resume &lt;id&gt;</code></td></tr>
           <tr><td><b class="k-grok">grok</b></td><td>its terminal title, then the screen; your own hooks if you add them</td><td>the title's <code>⚠ Action Required</code> and Grok's own prompt wording</td><td><code>--resume &lt;uuid&gt;</code><small>trix names each conversation</small></td></tr>
-          <tr><td><b class="k-opencode">opencode</b></td><td>a plugin passed in <code>OPENCODE_CONFIG_CONTENT</code></td><td><code>permission.asked</code> and <code>question.asked</code> events</td><td><code>--session &lt;id&gt;</code></td></tr>
+          <tr><td><b class="k-opencode">opencode</b><small>2.x runs --standalone</small></td><td>a plugin passed in <code>OPENCODE_CONFIG_CONTENT</code><small>for OpenCode 1 and 2, each pane its own server</small></td><td><code>permission.asked</code>, and <code>question.asked</code> or a question form</td><td><code>--session &lt;id&gt;</code></td></tr>
           <tr><td><b class="k-cursor">cursor</b><small>runs cursor-agent</small></td><td>output and screen; a <code>--plugin-dir</code> plugin adds each tool</td><td>Cursor's approval prompts on screen</td><td><code>--resume &lt;chatId&gt;</code></td></tr>
         </tbody>
       </table>
     </div>
     <p class="under">Anything else runs as a custom command, with its state read from output and screen. The context gauge covers Claude and Codex.</p>
+
+    <h3 class="h3x" id="not-installed">Not installed yet? Start it anyway.</h3>
+    <p class="sub">When an agent isn't on your <code>PATH</code>, its pane installs it first, with the output on screen. Then the pane becomes that agent, with the first prompt, resume and hooks it would have had.</p>
+    <div class="persist">
+      <div class="code" aria-label="A lead agent spawning Grok before it is installed">
+<div><span class="p">$ </span>trix spawn grok --name scout --prompt "map the repo"</div>
+<div><span class="o">scout	~/code/web</span></div>
+<div><span class="p">$ </span>trix send scout "and list the tests"</div>
+<div><span class="b">trix: 'scout' is still installing grok (npm) — `trix wait` for it first</span></div>
+<div><span class="p">$ </span>trix wait scout   <span class="cm"># through the install, then its first turn</span></div>
+<div><span class="o">scout	done	finished after 1m12s</span></div>
+<div> </div>
+<div class="cm"># meanwhile, in scout's pane</div>
+<div><span class="tx">trix:</span> grok isn't installed yet. Installing it with npm:</div>
+<div>  npm install -g @xai-official/grok</div>
+<div> </div>
+<div><span class="tx">trix:</span> grok is installed. Starting it…</div>
+      </div>
+      <div class="crew reload" aria-label="scout's card in the trix sidebar, during and after the install">
+        <h4>SCOUT IN THE SIDEBAR</h4>
+        <div class="step">while it installs</div>
+        <div class="ag">
+          <div class="r1"><span class="n">2</span><span class="c-start" data-spin>⠹</span><span class="nm">scout</span><span class="t">21s</span></div>
+          <div class="r2">installing grok (npm)</div>
+          <div class="r3">grok <span class="sp">▃▅▂▆▃▁▄▂</span>  main</div>
+        </div>
+        <div class="step">then it's Grok, on its first prompt</div>
+        <div class="ag">
+          <div class="r1"><span class="n">2</span><span class="c-work" data-spin>⠹</span><span class="nm">scout</span><span class="t">8s</span></div>
+          <div class="r2">working</div>
+          <div class="r3">grok <span class="sp">▂▄▆▅▇▅▆▄</span>  main</div>
+        </div>
+      </div>
+    </div>
+    <div class="grid rails">
+      <div class="card"><div class="ic c-start">↓</div><h3>The first tool you have</h3><p>mise (the packages Omarchy uses), then Homebrew, npm, or the vendor's own install script. Grok never comes from Homebrew, whose <code>grok</code> is another program.</p></div>
+      <div class="card"><div class="ic c-start">⠹</div><h3>Starting, not working</h3><p>Install output never reads as a turn. <code>send</code> refuses until it's done and <code>wait</code> keeps waiting. Two panes starting the same agent install it once.</p></div>
+      <div class="card"><div class="ic c-block">↻</div><h3>Fails in plain sight</h3><p>A failed install leaves its output on screen, and <code>enter</code> tries again. Log in to each agent yourself the first time it runs.</p></div>
+    </div>
   </section>
 
   <section id="states">
@@ -661,7 +702,8 @@ footer .r { margin-left: auto; }
       <div class="key"><kbd>alt+o</kbd><span>agent menu (or right-click)</span></div>
       <div class="key"><kbd>alt+d</kbd><span>detach (agents keep running)</span></div>
       <div class="key"><kbd>alt+s</kbd><span>toggle sidebar</span></div>
-      <div class="key"><kbd>alt+m</kbd><span>mini sidebar, one line per agent</span></div>
+      <div class="key"><kbd>alt+m</kbd><span>mini sidebar: one line per agent, half the width</span></div>
+      <div class="key"><kbd>alt+c</kbd><span>one-line cards, instead of full ones that scroll</span></div>
       <div class="key"><kbd>alt+?</kbd><span>all keys</span></div>
       <div class="key"><kbd>alt+q</kbd><span>quit (stops every agent)</span></div>
     </div>
@@ -676,7 +718,7 @@ footer .r { margin-left: auto; }
 <div> </div>
 <div><span class="p">$ </span>trix                      <span class="cm"># open the workspace, or attach to the running one</span></div>
 <div><span class="p">$ </span>trix claude codex shell   <span class="cm"># …and start these agents in the current folder</span></div>
-<div>                            <span class="cm"># (also grok, opencode, cursor)</span></div>
+<div>                            <span class="cm"># (also grok, opencode, cursor; missing ones install first)</span></div>
 <div><span class="p">$ </span>trix attach               <span class="cm"># attach only; fails if nothing is running</span></div>
 <div><span class="p">$ </span>trix view                 <span class="cm"># watch read-only from another terminal (q leaves)</span></div>
 <div><span class="p">$ </span>trix ls                   <span class="cm"># agents and states, without attaching</span></div>
