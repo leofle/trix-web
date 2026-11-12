@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>trix — where coding agents live</title>
-<meta name="description" content="A terminal workspace for Claude Code, Codex and any CLI agent. See which agent is working, which one needs you, and which one finished while you were looking elsewhere.">
+<meta name="description" content="A terminal workspace for Claude Code, Codex, Grok, OpenCode, Cursor and any CLI agent. See which agent is working, which one needs you, and which one finished while you were looking elsewhere.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,7 +68,7 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .navlinks { display: flex; gap: 22px; font-size: 14px; }
 .navlinks a { text-decoration: none; color: var(--dim); transition: color .15s; }
 .navlinks a:hover { color: var(--fg-hi); }
-@media (max-width: 600px) { .navlinks a:not(.gh) { display: none; } }
+@media (max-width: 1000px) { .navlinks a:not(.gh) { display: none; } }
 
 /* ---------- hero ---------- */
 .hero { display: grid; grid-template-columns: 1.25fr 1fr; align-items: center; gap: 40px; padding: 48px 0 56px; }
@@ -178,7 +178,10 @@ h1 .needs::after { content: ""; position: absolute; left: 0; right: 0; bottom: .
 .ag .r3 { color: var(--dim); }
 .ag .sp { color: var(--accent); letter-spacing: -.5px; }
 .ag .un { color: var(--cyan); }
-.pane { position: relative; padding: 12px 16px; min-width: 0; }
+.pane { position: relative; padding: 12px 16px; min-width: 0; display: flex; flex-direction: column; }
+.pane .lines { flex: 1; }
+.pfoot { display: flex; justify-content: flex-end; gap: 8px; color: var(--dim); border-top: 1px solid #222436; padding-top: 8px; margin-top: 10px; white-space: nowrap; overflow: hidden; }
+.pfoot .sep { color: var(--muted); }
 .ptitle { display: flex; gap: 10px; color: var(--dim); border-bottom: 1px solid #222436; padding-bottom: 8px; margin-bottom: 10px; white-space: nowrap; overflow: hidden; }
 .ptitle .nm { color: #c0caf5; font-weight: 700; }
 .ptitle .r { margin-left: auto; }
@@ -301,6 +304,17 @@ kbd { font: 700 13px var(--mono); color: var(--fg-hi); background: var(--surface
 .srch .ft b { color: var(--accent); }
 .srch .ft span { color: var(--fg); }
 .k-claude { color: #ff9e64; } .k-codex { color: var(--cyan); }
+.k-grok { color: #c0caf5; } .k-opencode { color: var(--accent); } .k-cursor { color: #9cb4fb; }
+
+/* supported agents */
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; background: rgba(22,22,30,.75); }
+.tbl table { width: 100%; min-width: 760px; border-collapse: collapse; font-size: 13.5px; }
+.tbl th { text-align: left; font: 700 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); padding: 16px 18px 10px; border-bottom: 1px solid var(--line); }
+.tbl td { padding: 13px 18px; border-bottom: 1px dashed var(--line); vertical-align: top; }
+.tbl tr:last-child td { border-bottom: 0; }
+.tbl td:first-child { white-space: nowrap; }
+.tbl td code { color: var(--cyan); font-size: .95em; }
+.tbl small { display: block; color: var(--dim); font-size: 12px; margin-top: 2px; }
 /* agent control */
 .crew { background: #1a1b26; border: 1px solid var(--line); border-radius: 14px; padding: 12px 0 16px; font-size: 13.5px; line-height: 1.55; position: relative; min-width: 0; }
 .crew h4 { margin: 0 0 6px; padding: 0 16px; font: 700 11px var(--mono); letter-spacing: .14em; color: var(--dim); }
@@ -368,6 +382,7 @@ footer .r { margin-left: auto; }
     <a class="brand" href="#"><img src="favicon.svg" alt=""><span class="word">tr<span class="i">ı</span>x</span></a>
     <div class="navlinks">
       <a href="#features">features</a>
+      <a href="#supported">agents</a>
       <a href="#states">states</a>
       <a href="#control">control</a>
       <a href="#search">search</a>
@@ -382,7 +397,7 @@ footer .r { margin-left: auto; }
     <div>
       <span class="eyebrow"><b>⠹</b> a workspace where coding agents live</span>
       <h1>Know which agent <span class="needs">needs you.</span></h1>
-      <p class="lede">Run Claude Code, Codex, shells or any CLI agent side by side. trix shows you at a glance which one is working, which one is waiting on you, and which one finished while you were looking elsewhere.</p>
+      <p class="lede">Run Claude Code, Codex, Grok, OpenCode, Cursor, shells or any CLI agent side by side. trix shows you at a glance which one is working, which one is waiting on you, and which one finished while you were looking elsewhere.</p>
       <div class="cta">
         <div class="install"><span class="p">$</span><code>cargo install --path .</code><button class="copy" data-copy="cargo install --path .">copy</button></div>
         <a class="btn" href="#install">get trix →</a>
@@ -403,6 +418,7 @@ footer .r { margin-left: auto; }
       <div class="pane">
         <div class="ptitle" id="ptitle"></div>
         <div class="lines" id="lines"></div>
+        <div class="pfoot" id="pfoot"></div>
         <div class="strip" id="strip"></div>
       </div>
     </div>
@@ -414,13 +430,34 @@ footer .r { margin-left: auto; }
     <h2>The agent comes first.</h2>
     <p class="sub">tmux and zellij don't know anything about agents. Other tools treat the agent as just another pane. trix is built around what each agent is doing.</p>
     <div class="grid">
-      <div class="card"><div class="ic c-acc">⚓</div><h3>Hooks first, guessing second</h3><p>Claude Code and Codex report their own lifecycle: prompts, each tool call, permission requests, finished and interrupted turns. Your agent configs are never touched.</p></div>
+      <div class="card"><div class="ic c-acc">⚓</div><h3>Hooks first, guessing second</h3><p>Claude Code, Codex, OpenCode and Cursor report their own lifecycle: prompts, each tool call, permission requests, finished and interrupted turns. Your agent configs are never touched.</p></div>
       <div class="card"><div class="ic c-block">▲</div><h3>Feedback you can't miss</h3><p>A red strip over your current pane, a desktop notification, a terminal bell, a rising chime when unseen work finishes, and a live title count. Each agent shows a sparkline, its branch and its diff so far.</p></div>
       <div class="card"><div class="ic c-work">⌥</div><h3>One key to what matters</h3><p><code>alt+a</code> goes to the agent that has been blocked longest, then to finished work you haven't seen yet.</p></div>
       <div class="card"><div class="ic c-start">▦</div><h3>Every agent at once</h3><p><code>alt+g</code> tiles all agents live. Blocked tiles turn red and the rest fade back a little.</p></div>
+      <div class="card"><div class="ic c-work">◔</div><h3>Context at a glance</h3><p>Each Claude and Codex pane shows how full its context window is, read from the agent's own log: <code>context 31% · ~138k left</code>. It turns yellow at 70% and red at 85%.</p></div>
+      <div class="card"><div class="ic c-acc">⇉</div><h3>Broadcast, safely</h3><p><code>alt+b</code> sends one prompt to every agent, or only the idle and done ones. Agents sitting on a prompt are skipped, so a broadcast never answers a permission dialog.</p></div>
       <div class="card"><div class="ic c-done">⑂</div><h3>Worktrees built in</h3><p>Each agent can get its own <code>trix/&lt;name&gt;</code> branch in a git worktree, so parallel agents never step on each other.</p></div>
-      <div class="card"><div class="ic" style="color:var(--mag)">⚡</div><h3>Fast and quiet</h3><p>Rust, <code>alacritty_terminal</code> and <code>ratatui</code>. About 0.4% of one core and 10 MB of RAM when idle. It follows your Omarchy theme live.</p></div>
+      <div class="card"><div class="ic" style="color:var(--mag)">⚡</div><h3>Fast and quiet</h3><p>Rust, <code>alacritty_terminal</code> and <code>ratatui</code>. It only redraws when something changes: about 0.4% of one core and 10 MB of RAM when idle.</p></div>
+      <div class="card"><div class="ic c-start">◈</div><h3>Follows your theme</h3><p>trix reads Omarchy's <code>colors.toml</code> and restyles live when you switch. Without Omarchy it's Tokyo Night, or point <code>TRIX_THEME</code> at a colors.toml.</p></div>
     </div>
+  </section>
+
+  <section id="supported">
+    <h2>Bring your agent.</h2>
+    <p class="sub">trix starts each agent itself and passes what it needs to that one process, so nothing is installed into your agent configs. All five resume their conversation after a restart. Have them installed and logged in first.</p>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>agent</th><th>live state from</th><th>needs you from</th><th>resume</th></tr></thead>
+        <tbody>
+          <tr><td><b class="k-claude">claude</b></td><td>hooks, through a <code>--settings</code> overlay</td><td><code>PermissionRequest</code> and <code>AskUserQuestion</code> hooks</td><td><code>--resume &lt;id&gt;</code></td></tr>
+          <tr><td><b class="k-codex">codex</b></td><td>hooks through <code>-c</code> (trusted once), plus <code>notify</code></td><td><code>PermissionRequest</code> hook</td><td><code>codex resume &lt;id&gt;</code></td></tr>
+          <tr><td><b class="k-grok">grok</b></td><td>its terminal title, then the screen; your own hooks if you add them</td><td>the title's <code>⚠ Action Required</code> and Grok's own prompt wording</td><td><code>--resume &lt;uuid&gt;</code><small>trix names each conversation</small></td></tr>
+          <tr><td><b class="k-opencode">opencode</b></td><td>a plugin passed in <code>OPENCODE_CONFIG_CONTENT</code></td><td><code>permission.asked</code> and <code>question.asked</code> events</td><td><code>--session &lt;id&gt;</code></td></tr>
+          <tr><td><b class="k-cursor">cursor</b><small>runs cursor-agent</small></td><td>output and screen; a <code>--plugin-dir</code> plugin adds each tool</td><td>Cursor's approval prompts on screen</td><td><code>--resume &lt;chatId&gt;</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="under">Anything else runs as a custom command, with its state read from output and screen. The context gauge covers Claude and Codex.</p>
   </section>
 
   <section id="states">
@@ -478,7 +515,7 @@ footer .r { margin-left: auto; }
     <div class="grid rails">
       <div class="card"><div class="ic c-block">▲</div><h3>Never answers for you</h3><p><code>send</code> refuses an agent that needs you, since its Enter would answer the prompt. Answering prompts is left to you on purpose.</p></div>
       <div class="card"><div class="ic c-acc">‹</div><h3>You can see who drives</h3><p>Every <code>send</code> shows a toast, and agents another agent started or prompted show <code>‹lead</code> next to their name.</p></div>
-      <div class="card"><div class="ic c-work">⏎</div><h3>Built for scripts</h3><p><code>wait</code> prints <code>name state activity</code> lines, <code>ls --json</code> has every detail, and exit codes say what happened (124: timed out, run it again).</p></div>
+      <div class="card"><div class="ic c-work">⏎</div><h3>Built for scripts</h3><p><code>wait</code> prints <code>name state activity</code> lines, <code>ls --json</code> has every detail (context included), and exit codes say what happened (124: timed out, run it again).</p></div>
     </div>
   </section>
 
@@ -527,7 +564,7 @@ footer .r { margin-left: auto; }
     </div>
     <div class="grid g2">
       <div class="card"><div class="ic c-acc">⇢</div><h3>Detach and attach</h3><p>Run <code>trix</code> again from any terminal to pick up where you were, scrollback included. <code>trix ls</code> shows who needs you without attaching.</p></div>
-      <div class="card"><div class="ic c-done">↻</div><h3>Survives restarts</h3><p>The workspace is saved as it changes. After a crash, a reboot or <code>trix kill</code>, Claude and Codex resume the exact conversation each pane was in, and shells reopen in their folder.</p></div>
+      <div class="card"><div class="ic c-done">↻</div><h3>Survives restarts</h3><p>The workspace is saved as it changes. After a crash, a reboot or <code>trix kill</code>, Claude, Codex, Grok, OpenCode and Cursor resume the exact conversation each pane was in, and shells reopen in their folder.</p></div>
       <div class="card"><div class="ic" style="color:var(--mag)">◇</div><h3>Named sessions</h3><p><code>trix -s work</code> and <code>trix -s home</code> are separate workspaces, each with its own agents, saved layout and attached terminal.</p></div>
       <div class="card"><div class="ic c-start">◉</div><h3>Watch without taking over</h3><p><code>trix view</code> attaches read-only from any number of other terminals: a second monitor, a laptop over SSH, a teammate on the same box. Nothing a viewer types reaches an agent.</p></div>
     </div>
@@ -565,7 +602,7 @@ footer .r { margin-left: auto; }
     <h2>All on <kbd style="font-size:.6em;vertical-align:middle">alt</kbd>.</h2>
     <p class="sub">Every other key goes straight to the focused agent, including <code>shift+enter</code> for a newline in the Claude and Codex composers.</p>
     <div class="keys">
-      <div class="key"><kbd>alt+n</kbd><span>new agent: claude, codex, shell, custom</span></div>
+      <div class="key"><kbd>alt+n</kbd><span>new agent: any kind, folder, first prompt</span></div>
       <div class="key"><kbd>alt+a</kbd><span>next agent that needs you</span></div>
       <div class="key"><kbd>alt+1…9</kbd><kbd>alt+j/k</kbd><span>jump / next / previous</span></div>
       <div class="key"><kbd>alt+g</kbd><span>grid ⇄ focus</span></div>
@@ -589,6 +626,7 @@ footer .r { margin-left: auto; }
 <div> </div>
 <div><span class="p">$ </span>trix                      <span class="cm"># open the workspace, or attach to the running one</span></div>
 <div><span class="p">$ </span>trix claude codex shell   <span class="cm"># …and start these agents in the current folder</span></div>
+<div>                            <span class="cm"># (also grok, opencode, cursor)</span></div>
 <div><span class="p">$ </span>trix attach               <span class="cm"># attach only; fails if nothing is running</span></div>
 <div><span class="p">$ </span>trix view                 <span class="cm"># watch read-only from another terminal (q leaves)</span></div>
 <div><span class="p">$ </span>trix ls                   <span class="cm"># agents and states, without attaching</span></div>
@@ -601,6 +639,7 @@ footer .r { margin-left: auto; }
       <code>TRIX_THEME=path/to/colors.toml</code>
       <code>TRIX_NO_NOTIFY=1</code>
       <code>TRIX_NO_SOUND=1</code>
+      <code>TRIX_CLAUDE_CONTEXT=&lt;tokens&gt;</code>
       <code>trix hook &lt;source&gt;</code>
     </div>
     <p class="codex-note">Using Codex? Open a Codex pane, type <code>/hooks</code> and trust trix's eight hooks once. From then on every Codex pane shows live detail like <code>exec_command cargo test</code> and <code>apply_patch app.rs</code>, just like Claude.</p>
@@ -663,9 +702,9 @@ footer .r { margin-left: auto; }
 
   /* ---- terminal demo ---- */
   const fresh = () => [
-    { name: 'web',   kind: 'claude', br: 'main',      dir: '~/code/web',  diff: '+42 −7', st: 'working', act: 'Edit src/app.tsx', t: 134, spark: [2,4,6,4,2,1,0,4], phase: 0 },
-    { name: 'api',   kind: 'claude', br: 'trix/api',  dir: '~/code/api',  diff: '+8 −2',  st: 'working', act: 'Bash cargo test',  t: 12,  spark: [0,0,1,4,0,0,0,0], phase: 0 },
-    { name: 'docs',  kind: 'codex',  br: 'trix/docs', dir: '~/code/web',  diff: '+120',   st: 'done',    act: 'turn finished',    t: 48,  spark: [3,2,1,0,0,0,0,0], phase: 0 },
+    { name: 'web',   kind: 'claude', br: 'main',      dir: '~/code/web',  diff: '+42 −7', st: 'working', act: 'Edit src/app.tsx', t: 134, spark: [2,4,6,4,2,1,0,4], phase: 0, ctx: [31, '~138k'] },
+    { name: 'api',   kind: 'claude', br: 'trix/api',  dir: '~/code/api',  diff: '+8 −2',  st: 'working', act: 'Bash cargo test',  t: 12,  spark: [0,0,1,4,0,0,0,0], phase: 0, ctx: [78, '~44k'] },
+    { name: 'docs',  kind: 'codex',  br: 'trix/docs', dir: '~/code/web',  diff: '+120',   st: 'done',    act: 'turn finished',    t: 48,  spark: [3,2,1,0,0,0,0,0], phase: 0, ctx: [42, '150k'] },
     { name: 'shell', kind: 'shell',  br: 'main',      dir: '~/code',      diff: '',       st: 'idle',    act: 'zsh',              t: 301, spark: [0,0,0,0,0,0,0,0], phase: 0 },
   ];
   let A = fresh(), focus = 0, frame = 0, clock = 0;
@@ -742,6 +781,11 @@ footer .r { margin-left: auto; }
     const f = A[focus];
     $('ptitle').innerHTML = `${glyph(f.st)}<span class="nm">${f.name}</span><span>${f.kind} · ${esc(f.act)}</span><span class="r">${f.dir}  ${f.br} ${f.diff ? `<span class="c-done">${f.diff.split(' ')[0]}</span> <span class="c-block" style="font-weight:400">${f.diff.split(' ')[1] || ''}</span>` : ''}</span>`;
     $('lines').innerHTML = pane(f).join('');
+    // bottom border: context gauge (Claude/Codex), then state and time in state
+    const ST = { working: ['working', 'c-work'], blocked: ['needs you', 'c-block'], done: ['done', 'c-done'], idle: ['idle', 'c-idle'] }[f.st];
+    const ctxCol = f.ctx && (f.ctx[0] >= 85 ? 'var(--block)' : f.ctx[0] >= 70 ? 'var(--work)' : 'var(--dim)');
+    $('pfoot').innerHTML = (f.ctx ? `<span style="color:${ctxCol}">context ${f.ctx[0]}% · ${f.ctx[1]} left</span><span class="sep">·</span>` : '') +
+      `<span class="${ST[1]}" style="font-weight:400">${ST[0]}</span><span>${dur(f.t)}</span>`;
 
     const blk = A.find((a, i) => a.st === 'blocked' && i !== focus);
     const strip = $('strip');
