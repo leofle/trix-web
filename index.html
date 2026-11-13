@@ -391,7 +391,7 @@ footer .r { margin-left: auto; }
       <h1>Know which agent <span class="needs">needs you.</span></h1>
       <p class="lede">Run Claude Code, Codex, Grok, OpenCode, Cursor, shells or any CLI agent side by side. trix shows you at a glance which one is working, which one is waiting on you, and which one finished while you were looking elsewhere.</p>
       <div class="cta">
-        <div class="install"><span class="p">$</span><code>cargo install --path .</code><button class="copy" data-copy="cargo install --path .">copy</button></div>
+        <div class="install"><span class="p">$</span><code>brew tap leofle/trix &amp;&amp; brew install trix</code><button class="copy" data-copy="brew tap leofle/trix &amp;&amp; brew install trix">copy</button></div>
         <a class="btn" href="#install">get trix →</a>
       </div>
     </div>
@@ -694,8 +694,12 @@ footer .r { margin-left: auto; }
 
   <section id="install">
     <h2>Get it running.</h2>
-    <p class="sub">Runs on Linux and macOS. Build it with <a href="https://rustup.rs">Rust</a> and start it with whatever agents you want.</p>
+    <p class="sub">Runs on Linux and macOS. Install it with <a href="https://brew.sh">Homebrew</a>, or build it with <a href="https://rustup.rs">Rust</a>, and start it with whatever agents you want.</p>
     <div class="code">
+<div><span class="p">$ </span>brew tap leofle/trix</div>
+<div><span class="p">$ </span>brew install trix</div>
+<div> </div>
+<div><span class="cm"># or build it from source</span></div>
 <div><span class="p">$ </span>git clone https://github.com/leofle/trix.git &amp;&amp; cd trix</div>
 <div><span class="p">$ </span>cargo install --path .</div>
 <div> </div>
