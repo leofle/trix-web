@@ -117,38 +117,38 @@ h1 .needs::after { content: ""; position: absolute; left: 0; right: 0; bottom: .
 @media (max-width: 860px) {
   .hero { grid-template-columns: 1fr; padding-top: 16px; gap: 8px; }
   .stage { order: -1; }
-  .stage .mascot { width: 220px; }
+  .stage .mascot { width: 216px; }
   .bubble { right: auto; left: calc(50% + 70px); top: 6%; }
 }
 @media (max-width: 480px) { .bubble { left: auto; right: 0; top: 0; } }
 
 /* ---------- mascot ---------- */
+/* Pixel art: one SVG unit is one pixel, and everything moves in whole pixels (steps). */
 .mascot { overflow: visible; --st: var(--idle); }
 .mascot[data-state="working"] { --st: var(--work); }
 .mascot[data-state="blocked"] { --st: var(--block); }
 .mascot[data-state="done"]    { --st: var(--done); }
 .mascot .bulb, .mascot .bulb-glow { fill: var(--st); transition: fill .3s; }
-.mascot .bulb-glow { opacity: .35; }
-.mascot .bob { animation: bob 3.2s ease-in-out infinite; }
-.mascot .shadow { animation: shadow 3.2s ease-in-out infinite; transform-origin: 100px 198px; }
-.mascot .look { transition: transform .18s ease-out; }
-.mascot .eye { transform-box: fill-box; transform-origin: center; animation: blink 5s infinite; }
-.mascot .eye:nth-child(2) { animation-delay: .04s; }
+.mascot .bulb-glow { opacity: 0; }  /* the light: off when idle */
+.mascot:not([data-state="idle"]) .bulb-glow { opacity: .3; }
+.mascot .bob { animation: bob 1.6s steps(1) infinite; }
+.mascot .shadow { animation: shadow 1.6s steps(1) infinite; transform-box: fill-box; transform-origin: center; }
+.mascot .eye { transform-box: fill-box; transform-origin: 50% 100%; animation: blink 5s steps(1) infinite; }
 .mascot .happy, .mascot .mouth-o { display: none; }
 .mascot[data-state="done"] .open { display: none; }
 .mascot[data-state="done"] .happy { display: inline; }
-.mascot[data-state="blocked"] .mouth-smile { display: none; }
 .mascot[data-state="blocked"] .mouth-o { display: inline; }
-.mascot[data-state="blocked"] .eye { animation: none; transform: scale(1.15); }
-.mascot[data-state="blocked"] .body-g { animation: shake .5s ease-in-out infinite; transform-origin: 100px 110px; }
+.mascot[data-state="blocked"] .eye { animation: none; transform: scaleY(1.5); }
+.mascot[data-state="blocked"] .look { transform: none !important; }  /* startled: eyes fixed, and tall eyes never reach the edge */
+.mascot[data-state="blocked"] .body-g { animation: jitter .6s steps(1) infinite; }
 .mascot[data-state="blocked"] .bulb { animation: flash .6s steps(1) infinite; }
-.mascot[data-state="working"] .bulb-glow { animation: pulse 1.1s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-@keyframes bob { 50% { transform: translateY(-7px); } }
-@keyframes shadow { 50% { transform: scale(.82); opacity: .2; } }
-@keyframes blink { 0%, 94%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
-@keyframes shake { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
+.mascot[data-state="working"] .bulb-glow { animation: pulse 1.1s steps(1) infinite; }
+@keyframes bob { 50% { transform: translateY(-1px); } }
+@keyframes shadow { 50% { transform: scaleX(.715); opacity: .2; } }
+@keyframes blink { 96% { transform: scaleY(.5); } }
+@keyframes jitter { 25% { transform: translateX(-1px); } 50% { transform: none; } 75% { transform: translateX(1px); } }
 @keyframes flash { 50% { opacity: .35; } }
-@keyframes pulse { 50% { transform: scale(1.5); opacity: .15; } }
+@keyframes pulse { 50% { opacity: 0; } }
 
 /* ---------- terminal demo ---------- */
 .term {
@@ -233,7 +233,7 @@ h2 { font: 700 clamp(28px, 4vw, 40px)/1.1 var(--display); color: var(--fg-hi); l
 
 /* states */
 .states { display: grid; grid-template-columns: 260px 1fr; gap: 36px; align-items: center; }
-.states .mascot { width: 220px; margin: 0 auto; display: block; }
+.states .mascot { width: 216px; margin: 0 auto; display: block; }
 .chips { display: grid; gap: 10px; }
 .chip { display: grid; grid-template-columns: 44px 130px 1fr; align-items: center; gap: 8px; padding: 12px 16px; border-radius: 12px;
   border: 1px solid var(--line); background: rgba(22,22,30,.75); cursor: default; transition: border-color .2s, background .2s; font-size: 14px; }
@@ -248,7 +248,7 @@ h2 { font: 700 clamp(28px, 4vw, 40px)/1.1 var(--display); color: var(--fg-hi); l
 .chip[data-s="unseen"].on  { border-color: var(--cyan); background: rgba(125,207,255,.06); }
 @media (max-width: 760px) {
   .states { grid-template-columns: 1fr; gap: 16px; }
-  .states .mascot { width: 160px; }
+  .states .mascot { width: 162px; }
   .chip { grid-template-columns: 36px 1fr; }
   .chip span:last-child { grid-column: 2; font-size: 13px; }
 }
@@ -350,36 +350,19 @@ footer .r { margin-left: auto; }
 
 <!-- The mascot. Cloned wherever a [data-mascot] placeholder sits. -->
 <template id="mascot-tpl">
-<svg class="mascot" viewBox="0 0 200 210" aria-hidden="true">
-  <defs>
-    <linearGradient id="tb" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#c7a8ff"/>
-      <stop offset=".55" stop-color="#7aa2f7"/>
-      <stop offset="1" stop-color="#7dcfff"/>
-    </linearGradient>
-  </defs>
-  <ellipse class="shadow" cx="100" cy="198" rx="36" ry="6" fill="#000" opacity=".35"/>
+<svg class="mascot" viewBox="-1.5 -2.5 18 21" shape-rendering="crispEdges" aria-hidden="true">
+  <!-- the same 16×16 pixel character as favicon.svg; one unit = one pixel -->
+  <rect class="shadow" x="4" y="17" width="7" height="1" fill="#000" opacity=".35"/>
   <g class="bob">
     <g class="body-g">
-      <path d="M100 46 V20" stroke="#7aa2f7" stroke-width="5" stroke-linecap="round"/>
-      <circle class="bulb-glow" cx="100" cy="15" r="15"/>
-      <circle class="bulb" cx="100" cy="15" r="7"/>
-      <rect x="45" y="55" width="110" height="110" rx="26" transform="rotate(45 100 110)" fill="url(#tb)"/>
-      <path d="M68 82 L88 62" stroke="#fff" stroke-opacity=".35" stroke-width="5" stroke-linecap="round"/>
-      <rect x="62" y="88" width="76" height="46" rx="15" fill="#16161e"/>
-      <g class="look">
-        <g class="open">
-          <rect class="eye" x="81" y="101" width="10" height="18" rx="5" fill="#c0caf5"/>
-          <rect class="eye" x="109" y="101" width="10" height="18" rx="5" fill="#c0caf5"/>
-        </g>
-        <g class="happy" fill="none" stroke="#c0caf5" stroke-width="3.5" stroke-linecap="round">
-          <path d="M80 112 q6 -9 12 0"/><path d="M108 112 q6 -9 12 0"/>
-        </g>
+      <path class="bulb-glow" d="M6 -1h3v1H6z M5 0h1v2H5z M9 0h1v2H9z"/>
+      <rect class="bulb" x="6" y="0" width="3" height="2"/>
+      <path fill="#7aa2f7" d="M7 2h1v2H7z M6 4h3v1H6z M5 5h5v1H5z M4 6h7v1H4z M3 7h9v1H3z M2 8h11v1H2z M1 9h13v1H1z M2 10h11v1H2z M3 11h9v1H3z M4 12h7v1H4z M5 13h5v1H5z M6 14h3v1H6z M5 15h2v1H5z M8 15h2v1H8z"/>
+      <g class="look" fill="#16161e">
+        <g class="open"><rect class="eye" x="5" y="8" width="1" height="2"/><rect class="eye" x="9" y="8" width="1" height="2"/></g>
+        <path class="happy" d="M4 9h1v1H4z M5 8h1v1H5z M6 9h1v1H6z M8 9h1v1H8z M9 8h1v1H9z M10 9h1v1H10z"/>
       </g>
-      <ellipse cx="73" cy="124" rx="5" ry="3" fill="#f7768e" opacity=".55"/>
-      <ellipse cx="127" cy="124" rx="5" ry="3" fill="#f7768e" opacity=".55"/>
-      <path class="mouth-smile" d="M95 124 q5 4 10 0" fill="none" stroke="#c0caf5" stroke-width="2.5" stroke-linecap="round"/>
-      <ellipse class="mouth-o" cx="100" cy="126" rx="3.2" ry="3.8" fill="#c0caf5"/>
+      <rect class="mouth-o" x="7" y="11" width="1" height="1" fill="#16161e"/>
     </g>
   </g>
 </svg>
@@ -762,13 +745,13 @@ footer .r { margin-left: auto; }
   });
   const heroM = $('hero-mascot'), stateM = $('state-mascot');
 
-  // eyes follow the pointer
+  // eyes follow the pointer, a whole pixel at a time
   addEventListener('pointermove', e => {
     for (const m of [heroM, stateM]) {
       const r = m.getBoundingClientRect();
-      const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height * .53);
-      const d = Math.hypot(dx, dy) || 1, k = Math.min(1, d / 300);
-      m.querySelector('.look').style.transform = `translate(${(dx / d * 5 * k).toFixed(2)}px, ${(dy / d * 3.5 * k).toFixed(2)}px)`;
+      const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height * .55);
+      const d = Math.hypot(dx, dy) || 1, k = Math.min(1, d / 120);
+      m.querySelector('.look').style.transform = `translate(${Math.round(dx / d * k)}px, ${Math.round(dy / d * k)}px)`;
     }
   });
 
