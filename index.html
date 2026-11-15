@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>trix — where coding agents live</title>
-<meta name="description" content="A terminal workspace for Claude Code, Codex, Grok, OpenCode, Cursor, GitHub Copilot CLI, Muse Code and any CLI agent. See which agent is working, which one needs you, and which one finished while you were looking elsewhere.">
+<meta name="description" content="A terminal workspace for Claude Code, Codex, Grok, OpenCode, Cursor, GitHub Copilot CLI, Muse Code, Gemini CLI, Antigravity and any CLI agent. See which agent is working, which one needs you, and which one finished while you were looking elsewhere.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -364,6 +364,7 @@ kbd { font: 700 13px var(--mono); color: var(--fg-hi); background: var(--surface
 .rel li .pr { color: var(--dim); font-size: 12.5px; }
 @media (max-width: 600px) { .rel { grid-template-columns: 1fr; gap: 10px; } }
 .k-copilot { color: #9ece6a; } .k-muse { color: #bb9af7; }
+.k-gemini { color: #7aa2f7; } .k-antigravity { color: #e0af68; }
 
 footer { margin-top: 110px; padding: 30px 0 40px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--dim); }
 footer img { width: 32px; }
@@ -399,7 +400,7 @@ footer .r { margin-left: auto; }
 <div class="wrap">
   <nav>
     <a class="brand" href="#"><img src="favicon.svg" alt=""><span class="word">tr<span class="i">ı</span>x</span></a>
-    <a class="ver" href="https://github.com/leofle/trix/releases/latest" data-version-link><span data-version>v1.0.8</span></a>
+    <a class="ver" href="https://github.com/leofle/trix/releases/latest" data-version-link><span data-version>v1.1.5</span></a>
     <div class="navlinks">
       <a href="#features">features</a>
       <a href="#supported">agents</a>
@@ -417,9 +418,9 @@ footer .r { margin-left: auto; }
 
   <header class="hero">
     <div>
-      <a class="eyebrow" href="#new"><b>⠹</b> a workspace where coding agents live <span class="evr">· <span data-version>v1.0.8</span> is out →</span></a>
+      <a class="eyebrow" href="#new"><b>⠹</b> a workspace where coding agents live <span class="evr">· <span data-version>v1.1.5</span> is out →</span></a>
       <h1>Know which agent <span class="needs">needs you.</span></h1>
-      <p class="lede">Run Claude Code, Codex, Grok, OpenCode, Cursor, Copilot, Muse, shells or any CLI agent side by side. trix shows you at a glance which one is working, which one is waiting on you, and which one finished while you were looking elsewhere.</p>
+      <p class="lede">Run Claude Code, Codex, Grok, OpenCode, Cursor, Copilot, Muse, Gemini, Antigravity, shells or any CLI agent side by side. trix shows you at a glance which one is working, which one is waiting on you, and which one finished while you were looking elsewhere.</p>
       <div class="cta">
         <div class="install"><span class="p">$</span><code>brew install leofle/trix/trix</code><button class="copy" data-copy="brew install leofle/trix/trix">copy</button></div>
         <a class="btn" href="#install">get trix →</a>
@@ -452,7 +453,7 @@ footer .r { margin-left: auto; }
     <h2>The agent comes first.</h2>
     <p class="sub">tmux and zellij don't know anything about agents. Other tools treat the agent as just another pane. trix is built around what each agent is doing.</p>
     <div class="grid">
-      <div class="card"><div class="ic c-acc">⚓</div><h3>Agents report in, trix doesn't guess</h3><p>Claude Code, Codex, OpenCode, Cursor, Copilot and Muse tell trix directly when you send a prompt, when they run a tool, when they need your permission and when they finish. No screen-scraping, and your agent configs stay untouched.</p></div>
+      <div class="card"><div class="ic c-acc">⚓</div><h3>Agents report in, trix doesn't guess</h3><p>Claude Code, Codex, OpenCode, Cursor, Copilot and Muse tell trix directly when you send a prompt, when they run a tool, when they need your permission and when they finish. Gemini and Antigravity do too once you add trix's hooks. No screen-scraping, and trix never edits your agent configs.</p></div>
       <div class="card"><div class="ic c-block">▲</div><h3>Never miss an agent that needs you</h3><p>When an agent is waiting on you, you get a red bar over the pane you're in, a desktop notification with trix's icon and a terminal bell. A chime plays when work you haven't seen finishes, and the window title counts what's waiting. Each alert can be turned off. Every agent also shows a small activity graph, its git branch and how much it has changed.</p></div>
       <div class="card"><div class="ic c-work">⌥</div><h3>One key to what matters</h3><p>Press <code>alt+a</code> to jump to the agent that has been waiting on you the longest. If nothing is waiting, it takes you to finished work you haven't looked at yet.</p></div>
       <div class="card"><div class="ic c-start">▦</div><h3>See every agent at once</h3><p>Press <code>alt+g</code> to see your agents side by side, updating live, up to four per page. Agents waiting on you turn red and the others dim, so you know where to look first. trix remembers the grid view across restarts.</p></div>
@@ -469,7 +470,7 @@ footer .r { margin-left: auto; }
 
   <section id="supported">
     <h2>Bring your agent.</h2>
-    <p class="sub">trix starts each agent itself and passes what it needs to that one process, so your agent configs are never touched. All seven resume their conversation after a restart, and one you don't have yet <a href="#not-installed">installs in its own pane</a> the first time you start it.</p>
+    <p class="sub">trix starts each agent itself and passes what it needs to that one process, so your agent configs are never touched. All nine resume their conversation after a restart (Antigravity once its hooks report it), and one you don't have yet <a href="#not-installed">installs in its own pane</a> the first time you start it.</p>
     <div class="tbl">
       <table>
         <thead><tr><th>agent</th><th>live state from</th><th>needs you from</th><th>resume</th></tr></thead>
@@ -481,6 +482,8 @@ footer .r { margin-left: auto; }
           <tr><td><b class="k-cursor">cursor</b><small>runs cursor-agent</small></td><td>output and screen; a <code>--plugin-dir</code> plugin adds each tool</td><td>Cursor's approval prompts on screen</td><td><code>--resume &lt;chatId&gt;</code></td></tr>
           <tr><td><b class="k-copilot">copilot</b><small>GitHub Copilot CLI</small></td><td>a <code>--plugin-dir</code> plugin with Claude-style hooks</td><td><code>Notification</code> hook (<code>permission_prompt</code>), <code>ask_user</code></td><td><code>--session-id=&lt;uuid&gt;</code><small>trix names each conversation</small></td></tr>
           <tr><td><b class="k-muse">muse</b><small>Meta's Muse Code</small></td><td>a managed hooks file, passed with <code>-c</code><small>your own Muse hooks still run</small></td><td><code>Notification</code> hook (<code>permission_prompt</code>), <code>request_user_input</code></td><td><code>muse resume &lt;id&gt;</code></td></tr>
+          <tr><td><b class="k-gemini">gemini</b><small>Google's Gemini CLI</small></td><td>its terminal title, then the screen; trix's hooks once you add them</td><td>the title's <code>✋ Action Required</code> and Gemini's own prompt wording<small>with hooks, <code>Notification</code> (<code>ToolPermission</code>) and <code>ask_user</code></small></td><td><code>--resume &lt;uuid&gt;</code><small>trix names each conversation</small></td></tr>
+          <tr><td><b class="k-antigravity">antigravity</b><small>Google's Antigravity CLI, <code>agy</code></small></td><td>output and screen; trix's hooks once you add them</td><td>Antigravity's own trust and approval prompts on screen<small>with hooks, <code>ask_question</code></small></td><td><code>--conversation &lt;id&gt;</code><small>once its hooks report the id</small></td></tr>
         </tbody>
       </table>
     </div>
@@ -543,7 +546,7 @@ footer .r { margin-left: auto; }
 
   <section id="control">
     <h2>Agents can run agents.</h2>
-    <p class="sub"><code>trix spawn</code>, <code>send</code>, <code>read</code>, <code>wait</code>, <code>close</code> and <code>events</code> let a script, or an agent in another pane, work the workspace the way you do. A lead Claude can start workers in their own worktrees, hand them tasks, wait for them and read what they did.</p>
+    <p class="sub"><code>trix spawn</code>, <code>send</code>, <code>read</code>, <code>wait</code>, <code>close</code>, <code>events</code> and <code>args</code> let a script, or an agent in another pane, work the workspace the way you do. A lead Claude can start workers in their own worktrees, hand them tasks, wait for them and read what they did.</p>
     <div class="persist">
       <div class="code" aria-label="Agent control commands">
 <div><span class="p">$ </span>trix spawn claude --name api --worktree \</div>
@@ -561,6 +564,7 @@ footer .r { margin-left: auto; }
 <div><span class="o">10:21:03  api            <span class="w">working             </span>  Edit src/limit.rs</span></div>
 <div><span class="o">10:21:03  auth           <span class="d">done                </span>  turn finished</span></div>
 <div><span class="o">10:22:41  api            <span class="b">working → needs-you </span>  approve Bash rm -rf dist</span></div>
+<div><span class="p">$ </span>trix args api --model opus   <span class="cm"># the flags api starts with next time</span></div>
       </div>
       <div class="crew" aria-label="The trix sidebar with a lead agent driving two workers">
         <h4>AGENTS  3</h4>
@@ -586,6 +590,9 @@ footer .r { margin-left: auto; }
       <div class="card"><div class="ic c-block">▲</div><h3>Never answers for you</h3><p><code>send</code> refuses an agent that needs you, since its Enter would answer the prompt. Answering prompts is left to you on purpose.</p></div>
       <div class="card"><div class="ic c-acc">‹</div><h3>You can see who drives</h3><p>Every <code>send</code> shows a toast, and agents another agent started or prompted show <code>‹lead</code> next to their name.</p></div>
       <div class="card"><div class="ic c-work">⏎</div><h3>Built for scripts</h3><p><code>wait</code> prints <code>name state activity</code> lines, <code>events --json</code> streams every change, <code>ls --json</code> has every detail (context included), and exit codes say what happened.</p></div>
+      <div class="card"><div class="ic c-done">⇄</div><h3>Agents know their peers</h3><p>New conversations are told to run <code>trix ls --json</code>, find their own pane, and use <code>trix send</code> and <code>wait</code> when you ask them to work together. Claude, Codex, OpenCode, Copilot, Muse, Gemini and Antigravity get this. Grok and Cursor don't yet.</p></div>
+      <div class="card"><div class="ic c-start">⚑</div><h3>Fix an agent's flags</h3><p><code>trix args api --model opus</code> changes the flags an agent starts with. The change is saved with the workspace and used from its next start, such as a restore. With no flags, it shows the current ones.</p></div>
+      <div class="card"><div class="ic" style="color:var(--mag)">▣</div><h3>Works from a sandbox</h3><p>trix opens Codex's sandbox network so Codex panes can run <code>trix ls</code> and <code>trix send</code>. When a sandbox blocks trix's socket, as Antigravity's does, trix says so and the agent runs the command again outside it.</p></div>
     </div>
   </section>
 
@@ -634,7 +641,7 @@ footer .r { margin-left: auto; }
     </div>
     <div class="grid g2">
       <div class="card"><div class="ic c-acc">⇢</div><h3>Detach and attach</h3><p>Run <code>trix</code> again from any terminal to pick up where you were, scrollback included. <code>trix ls</code> shows who needs you without attaching.</p></div>
-      <div class="card"><div class="ic c-done">↻</div><h3>Survives restarts</h3><p>The workspace is saved as it changes. After a crash, a reboot or <code>trix kill</code>, Claude, Codex, Grok, OpenCode, Cursor, Copilot and Muse resume the exact conversation each pane was in, and shells reopen in their folder.</p></div>
+      <div class="card"><div class="ic c-done">↻</div><h3>Survives restarts</h3><p>The workspace is saved as it changes. After a crash, a reboot or <code>trix kill</code>, Claude, Codex, Grok, OpenCode, Cursor, Copilot, Muse, Gemini and Antigravity resume the exact conversation each pane was in, and shells reopen in their folder.</p></div>
       <div class="card"><div class="ic" style="color:var(--mag)">◇</div><h3>Named sessions</h3><p><code>trix -s work</code> and <code>trix -s home</code> are separate workspaces, each with its own agents, saved layout and attached terminal.</p></div>
       <div class="card"><div class="ic c-start">◉</div><h3>Watch without taking over</h3><p><code>trix view</code> attaches read-only from any number of other terminals: a second monitor, a laptop over SSH, a teammate on the same box. Nothing a viewer types reaches an agent.</p></div>
     </div>
@@ -734,35 +741,33 @@ footer .r { margin-left: auto; }
     <p class="sub">The latest releases of trix. This list comes from GitHub, so it is always current. <a href="https://github.com/leofle/trix/releases">All releases ↗</a></p>
     <div class="rels" id="rels">
       <div class="rel latest">
-        <div><a class="tag" href="https://github.com/leofle/trix/releases/tag/v1.0.8">v1.0.8</a><span class="when">Nov 15, 2026</span><span class="pill">latest</span></div>
+        <div><a class="tag" href="https://github.com/leofle/trix/releases/tag/v1.1.5">v1.1.5</a><span class="when">Nov 15, 2026</span><span class="pill">latest</span></div>
         <ul>
-          <li><a href="https://github.com/leofle/trix/pull/46">Select several agents and act on them at once <span class="pr">#46</span></a></li>
-          <li><a href="https://github.com/leofle/trix/pull/47">Icons rail numbers every agent; the top bar drops whole items when narrow <span class="pr">#47</span></a></li>
+          <li><a href="https://github.com/leofle/trix/pull/55">Yes/no dialogs take tab and the mouse <span class="pr">#55</span></a></li>
         </ul>
       </div>
       <div class="rel">
-        <div><a class="tag" href="https://github.com/leofle/trix/releases/tag/v1.0.7">v1.0.7</a><span class="when">Nov 14, 2026</span></div>
+        <div><a class="tag" href="https://github.com/leofle/trix/releases/tag/v1.1.4">v1.1.4</a><span class="when">Nov 15, 2026</span></div>
         <ul>
-          <li><a href="https://github.com/leofle/trix/pull/45">alt+m steps down to an icons-only sidebar <span class="pr">#45</span></a></li>
+          <li><a href="https://github.com/leofle/trix/pull/54">trix args: change the flags an agent starts with, from any shell <span class="pr">#54</span></a></li>
         </ul>
       </div>
       <div class="rel">
-        <div><a class="tag" href="https://github.com/leofle/trix/releases/tag/v1.0.6">v1.0.6</a><span class="when">Nov 14, 2026</span></div>
+        <div><a class="tag" href="https://github.com/leofle/trix/releases/tag/v1.1.3">v1.1.3</a><span class="when">Nov 15, 2026</span></div>
         <ul>
-          <li><a href="https://github.com/leofle/trix/pull/43">Remember the grid view across restarts <span class="pr">#43</span></a></li>
+          <li><a href="https://github.com/leofle/trix/pull/53">Copilot reads trix's workspace instructions, so it can see its peers <span class="pr">#53</span></a></li>
         </ul>
       </div>
       <div class="rel">
-        <div><a class="tag" href="https://github.com/leofle/trix/releases/tag/v1.0.5">v1.0.5</a><span class="when">Nov 14, 2026</span></div>
+        <div><a class="tag" href="https://github.com/leofle/trix/releases/tag/v1.1.2">v1.1.2</a><span class="when">Nov 15, 2026</span></div>
         <ul>
-          <li><a href="https://github.com/leofle/trix/pull/42">Grid: pane titles keep the name last; the sidebar steps aside for a narrow grid <span class="pr">#42</span></a></li>
+          <li><a href="https://github.com/leofle/trix/pull/52">Say when a sandbox blocks the workspace's socket <span class="pr">#52</span></a></li>
         </ul>
       </div>
       <div class="rel">
-        <div><a class="tag" href="https://github.com/leofle/trix/releases/tag/v1.0.4">v1.0.4</a><span class="when">Nov 14, 2026</span></div>
+        <div><a class="tag" href="https://github.com/leofle/trix/releases/tag/v1.1.1">v1.1.1</a><span class="when">Nov 15, 2026</span></div>
         <ul>
-          <li><a href="https://github.com/leofle/trix/pull/40">Keep every dialog inside its borders on a short terminal <span class="pr">#40</span></a></li>
-          <li><a href="https://github.com/leofle/trix/pull/41">Drop whole items from the Keys legend when it's narrow <span class="pr">#41</span></a></li>
+          <li><a href="https://github.com/leofle/trix/pull/51">Support Google's Antigravity CLI <span class="pr">#51</span></a></li>
         </ul>
       </div>
     </div>
@@ -771,7 +776,7 @@ footer .r { margin-left: auto; }
   <section id="install">
     <h2>Get it running.</h2>
     <p class="sub">Runs on Linux and macOS. Install it with <a href="https://brew.sh">Homebrew</a>, download a release, or build it with <a href="https://rustup.rs">Rust</a>. Then start it with whatever agents you want.</p>
-    <p class="relnote">Latest: <a href="https://github.com/leofle/trix/releases/latest" data-version-link><b data-version>v1.0.8</b></a> <span data-version-date>(Nov 15, 2026)</span>. <code>brew upgrade trix</code> gets it.</p>
+    <p class="relnote">Latest: <a href="https://github.com/leofle/trix/releases/latest" data-version-link><b data-version>v1.1.5</b></a> <span data-version-date>(Nov 15, 2026)</span>. <code>brew upgrade trix</code> gets it.</p>
     <div class="code">
 <div><span class="p">$ </span>brew install leofle/trix/trix</div>
 <div> </div>
@@ -787,7 +792,8 @@ footer .r { margin-left: auto; }
 <div> </div>
 <div><span class="p">$ </span>trix                      <span class="cm"># open the workspace, or attach to the running one</span></div>
 <div><span class="p">$ </span>trix claude codex shell   <span class="cm"># …and start these agents in the current folder</span></div>
-<div>                            <span class="cm"># (also grok, opencode, cursor, copilot, muse; missing ones install first)</span></div>
+<div>                            <span class="cm"># (also grok, opencode, cursor, copilot, muse, gemini,</span></div>
+<div>                            <span class="cm">#  antigravity; missing ones install first)</span></div>
 <div><span class="p">$ </span>trix attach               <span class="cm"># attach only; fails if nothing is running</span></div>
 <div><span class="p">$ </span>trix view                 <span class="cm"># watch read-only from another terminal (q leaves)</span></div>
 <div><span class="p">$ </span>trix ls                   <span class="cm"># agents and states, without attaching</span></div>
@@ -805,6 +811,7 @@ footer .r { margin-left: auto; }
       <code>trix hook &lt;source&gt;</code>
     </div>
     <p class="codex-note">Using Codex? Open a Codex pane, type <code>/hooks</code> and trust trix's eight hooks once. From then on every Codex pane shows live detail like <code>exec_command cargo test</code> and <code>apply_patch app.rs</code>, just like Claude.</p>
+    <p class="codex-note">Using Gemini or Antigravity? They can't be handed hooks per process, so add trix's hooks to <code>~/.gemini/settings.json</code> (Gemini) or <code>~/.gemini/config/hooks.json</code> (Antigravity) once. The snippets are in the <a href="https://github.com/leofle/trix#supported-agents">README</a>. Without them, trix reads their state from the screen.</p>
     <p class="codex-note">On a Mac? Every trix key is <code>alt+…</code>, so set your terminal's Option key to send Alt: <code>macos-option-as-alt = true</code> in Ghostty, Left Option as <code>Esc+</code> in iTerm2, "Use Option as Meta key" in Terminal.app.</p>
   </section>
 
