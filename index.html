@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>trix — where coding agents live</title>
-<meta name="description" content="A terminal workspace for Claude Code, Codex, Grok, OpenCode, Cursor and any CLI agent. See which agent is working, which one needs you, and which one finished while you were looking elsewhere.">
+<meta name="description" content="A terminal workspace for Claude Code, Codex, Grok, OpenCode, Cursor, GitHub Copilot CLI, Muse Code and any CLI agent. See which agent is working, which one needs you, and which one finished while you were looking elsewhere.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -69,12 +69,19 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .navlinks a { text-decoration: none; color: var(--dim); transition: color .15s; }
 .navlinks a:hover { color: var(--fg-hi); }
 @media (max-width: 1000px) { .navlinks a:not(.gh) { display: none; } }
+.ver { margin: 0 auto 0 12px; font-size: 12px; text-decoration: none; color: var(--dim); border: 1px solid var(--line);
+  border-radius: 999px; padding: 2px 9px; transition: color .15s, border-color .15s; }
+.ver:hover { color: var(--fg-hi); border-color: var(--accent); }
 
 /* ---------- hero ---------- */
 .hero { display: grid; grid-template-columns: 1.25fr 1fr; align-items: center; gap: 40px; padding: 48px 0 56px; }
 .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--cyan);
   border: 1px solid var(--line); background: rgba(22,22,30,.7); padding: 5px 12px; border-radius: 999px; }
 .eyebrow b { color: var(--work); font-weight: 500; }
+a.eyebrow { text-decoration: none; transition: border-color .15s; }
+a.eyebrow:hover { border-color: var(--accent); }
+.eyebrow .evr { color: var(--fg-hi); }
+@media (max-width: 520px) { .eyebrow .evr { display: none; } }
 h1 { font: 700 clamp(40px, 6vw, 68px)/1.02 var(--display); color: var(--fg-hi); letter-spacing: -.035em; margin: 22px 0 20px; }
 h1 .needs { color: var(--block); position: relative; white-space: nowrap; }
 h1 .needs::after { content: ""; position: absolute; left: 0; right: 0; bottom: .02em; height: .09em;
@@ -334,8 +341,29 @@ kbd { font: 700 13px var(--mono); color: var(--fg-hi); background: var(--surface
 .fname { color: var(--dim); }
 .toml .k { color: var(--accent); } .toml .s { color: var(--done); } .toml .h { color: var(--mag); }
 
+.relnote { margin: -20px 0 24px; font-size: 14px; color: var(--dim); }
+.relnote a { text-decoration: none; } .relnote b { color: var(--done); }
+.relnote code { color: var(--cyan); }
 .codex-note { margin-top: 16px; font-size: 13.5px; color: var(--dim); }
 .codex-note code { color: var(--cyan); }
+
+/* what's new */
+.rels { display: grid; gap: 14px; }
+.rel { display: grid; grid-template-columns: 170px 1fr; gap: 20px; background: rgba(22,22,30,.75); border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; }
+.rel.latest { border-color: #3b4261; }
+.rel .tag { font: 700 18px/1.25 var(--display); color: var(--fg-hi); text-decoration: none; }
+.rel .tag:hover { color: var(--accent); }
+.rel .when { display: block; color: var(--dim); font-size: 13px; margin-top: 4px; }
+.rel .pill { display: inline-block; margin-top: 8px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--done); border: 1px solid currentColor; border-radius: 999px; padding: 1px 8px; }
+.rel ul { margin: 0; padding: 0; list-style: none; font-size: 14px; }
+.rel li { padding-left: 1.4em; position: relative; }
+.rel li + li { margin-top: 6px; }
+.rel li::before { content: "▸"; position: absolute; left: 0; color: var(--accent); }
+.rel li a { text-decoration: none; }
+.rel li a:hover { color: var(--fg-hi); text-decoration: underline; }
+.rel li .pr { color: var(--dim); font-size: 12.5px; }
+@media (max-width: 600px) { .rel { grid-template-columns: 1fr; gap: 10px; } }
+.k-copilot { color: #9ece6a; } .k-muse { color: #bb9af7; }
 
 footer { margin-top: 110px; padding: 30px 0 40px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--dim); }
 footer img { width: 32px; }
@@ -371,6 +399,7 @@ footer .r { margin-left: auto; }
 <div class="wrap">
   <nav>
     <a class="brand" href="#"><img src="favicon.svg" alt=""><span class="word">tr<span class="i">ı</span>x</span></a>
+    <a class="ver" href="https://github.com/leofle/trix/releases/latest" data-version-link><span data-version>v1.0.8</span></a>
     <div class="navlinks">
       <a href="#features">features</a>
       <a href="#supported">agents</a>
@@ -380,6 +409,7 @@ footer .r { margin-left: auto; }
       <a href="#sessions">sessions</a>
       <a href="#config">config</a>
       <a href="#keys">keys</a>
+      <a href="#new">new</a>
       <a href="#install">install</a>
       <a class="gh" href="https://github.com/leofle/trix">github ↗</a>
     </div>
@@ -387,11 +417,11 @@ footer .r { margin-left: auto; }
 
   <header class="hero">
     <div>
-      <span class="eyebrow"><b>⠹</b> a workspace where coding agents live</span>
+      <a class="eyebrow" href="#new"><b>⠹</b> a workspace where coding agents live <span class="evr">· <span data-version>v1.0.8</span> is out →</span></a>
       <h1>Know which agent <span class="needs">needs you.</span></h1>
-      <p class="lede">Run Claude Code, Codex, Grok, OpenCode, Cursor, shells or any CLI agent side by side. trix shows you at a glance which one is working, which one is waiting on you, and which one finished while you were looking elsewhere.</p>
+      <p class="lede">Run Claude Code, Codex, Grok, OpenCode, Cursor, Copilot, Muse, shells or any CLI agent side by side. trix shows you at a glance which one is working, which one is waiting on you, and which one finished while you were looking elsewhere.</p>
       <div class="cta">
-        <div class="install"><span class="p">$</span><code>brew tap leofle/trix &amp;&amp; brew install trix</code><button class="copy" data-copy="brew tap leofle/trix &amp;&amp; brew install trix">copy</button></div>
+        <div class="install"><span class="p">$</span><code>brew install leofle/trix/trix</code><button class="copy" data-copy="brew install leofle/trix/trix">copy</button></div>
         <a class="btn" href="#install">get trix →</a>
       </div>
     </div>
@@ -422,21 +452,24 @@ footer .r { margin-left: auto; }
     <h2>The agent comes first.</h2>
     <p class="sub">tmux and zellij don't know anything about agents. Other tools treat the agent as just another pane. trix is built around what each agent is doing.</p>
     <div class="grid">
-      <div class="card"><div class="ic c-acc">⚓</div><h3>Agents report in, trix doesn't guess</h3><p>Claude Code, Codex, OpenCode and Cursor tell trix directly when you send a prompt, when they run a tool, when they need your permission and when they finish. No screen-scraping, and your agent configs stay untouched.</p></div>
-      <div class="card"><div class="ic c-block">▲</div><h3>Never miss an agent that needs you</h3><p>When an agent is waiting on you, you get a red bar over the pane you're in, a desktop notification and a terminal bell. A chime plays when work you haven't seen finishes, and the window title counts what's waiting. Each alert can be turned off. Every agent also shows a small activity graph, its git branch and how much it has changed.</p></div>
+      <div class="card"><div class="ic c-acc">⚓</div><h3>Agents report in, trix doesn't guess</h3><p>Claude Code, Codex, OpenCode, Cursor, Copilot and Muse tell trix directly when you send a prompt, when they run a tool, when they need your permission and when they finish. No screen-scraping, and your agent configs stay untouched.</p></div>
+      <div class="card"><div class="ic c-block">▲</div><h3>Never miss an agent that needs you</h3><p>When an agent is waiting on you, you get a red bar over the pane you're in, a desktop notification with trix's icon and a terminal bell. A chime plays when work you haven't seen finishes, and the window title counts what's waiting. Each alert can be turned off. Every agent also shows a small activity graph, its git branch and how much it has changed.</p></div>
       <div class="card"><div class="ic c-work">⌥</div><h3>One key to what matters</h3><p>Press <code>alt+a</code> to jump to the agent that has been waiting on you the longest. If nothing is waiting, it takes you to finished work you haven't looked at yet.</p></div>
-      <div class="card"><div class="ic c-start">▦</div><h3>See every agent at once</h3><p>Press <code>alt+g</code> to see your agents side by side, updating live, up to four per page. Agents waiting on you turn red and the others dim, so you know where to look first.</p></div>
+      <div class="card"><div class="ic c-start">▦</div><h3>See every agent at once</h3><p>Press <code>alt+g</code> to see your agents side by side, updating live, up to four per page. Agents waiting on you turn red and the others dim, so you know where to look first. trix remembers the grid view across restarts.</p></div>
       <div class="card"><div class="ic c-work">◔</div><h3>Know when context runs low</h3><p>Claude and Codex panes show how much of the context window is used, for example <code>context 31% · ~138k left</code>. It turns yellow at 70% and red at 85%, before the agent starts forgetting.</p></div>
       <div class="card"><div class="ic c-acc">⇉</div><h3>One prompt, many agents</h3><p>Press <code>alt+b</code> to send the same prompt to all your agents, or only to the idle and finished ones. Agents waiting on a permission question are skipped, so your prompt is never mistaken for an answer.</p></div>
       <div class="card"><div class="ic c-done">⑂</div><h3>Worktrees built in</h3><p>Each agent can work in its own git worktree on its own branch (<code>trix/&lt;name&gt;</code>), so agents running in parallel never overwrite each other's files.</p></div>
       <div class="card"><div class="ic" style="color:var(--mag)">⚡</div><h3>Fast and light</h3><p>Written in Rust on <code>alacritty_terminal</code> and <code>ratatui</code>. trix only redraws when something changes, so when idle it uses about 0.4% of one CPU core and 10 MB of memory.</p></div>
-      <div class="card"><div class="ic c-start">◈</div><h3>Matches your theme</h3><p>On Omarchy, trix uses your theme's <code>colors.toml</code> and updates the moment you switch. Elsewhere it uses Tokyo Night, or set <code>TRIX_THEME</code> to any colors.toml file.</p></div>
+      <div class="card"><div class="ic c-block">⚲</div><h3>Pin what matters</h3><p>Click the pin in a pane's title and that agent moves to the top of the sidebar. You can pin up to two, and they stay in place while the rest of the list scrolls.</p></div>
+      <div class="card"><div class="ic c-acc">☑</div><h3>Act on several at once</h3><p>Press <code>alt+x</code>, or alt+click a card, to select agents. Then close them, show only them in the grid, or send them one prompt, all in one go.</p></div>
+      <div class="card"><div class="ic c-done">⚙</div><h3>Settings in place</h3><p>Press <code>alt+,</code> (or click <i>settings</i> in the bottom bar) to change the theme, the sidebar, notifications and sounds. Each change is saved to your config files, and your comments stay.</p></div>
+      <div class="card"><div class="ic c-start">◈</div><h3>Matches your theme</h3><p>On Omarchy, trix follows your theme and updates the moment you switch. Anywhere else, pick one of the 23 themes trix ships, from Catppuccin to White. The list tries each one on as you move through it.</p></div>
     </div>
   </section>
 
   <section id="supported">
     <h2>Bring your agent.</h2>
-    <p class="sub">trix starts each agent itself and passes what it needs to that one process, so your agent configs are never touched. All five resume their conversation after a restart, and one you don't have yet <a href="#not-installed">installs in its own pane</a> the first time you start it.</p>
+    <p class="sub">trix starts each agent itself and passes what it needs to that one process, so your agent configs are never touched. All seven resume their conversation after a restart, and one you don't have yet <a href="#not-installed">installs in its own pane</a> the first time you start it.</p>
     <div class="tbl">
       <table>
         <thead><tr><th>agent</th><th>live state from</th><th>needs you from</th><th>resume</th></tr></thead>
@@ -446,6 +479,8 @@ footer .r { margin-left: auto; }
           <tr><td><b class="k-grok">grok</b></td><td>its terminal title, then the screen; your own hooks if you add them</td><td>the title's <code>⚠ Action Required</code> and Grok's own prompt wording</td><td><code>--resume &lt;uuid&gt;</code><small>trix names each conversation</small></td></tr>
           <tr><td><b class="k-opencode">opencode</b><small>2.x runs --standalone</small></td><td>a plugin passed in <code>OPENCODE_CONFIG_CONTENT</code><small>for OpenCode 1 and 2, each pane its own server</small></td><td><code>permission.asked</code>, and <code>question.asked</code> or a question form</td><td><code>--session &lt;id&gt;</code></td></tr>
           <tr><td><b class="k-cursor">cursor</b><small>runs cursor-agent</small></td><td>output and screen; a <code>--plugin-dir</code> plugin adds each tool</td><td>Cursor's approval prompts on screen</td><td><code>--resume &lt;chatId&gt;</code></td></tr>
+          <tr><td><b class="k-copilot">copilot</b><small>GitHub Copilot CLI</small></td><td>a <code>--plugin-dir</code> plugin with Claude-style hooks</td><td><code>Notification</code> hook (<code>permission_prompt</code>), <code>ask_user</code></td><td><code>--session-id=&lt;uuid&gt;</code><small>trix names each conversation</small></td></tr>
+          <tr><td><b class="k-muse">muse</b><small>Meta's Muse Code</small></td><td>a managed hooks file, passed with <code>-c</code><small>your own Muse hooks still run</small></td><td><code>Notification</code> hook (<code>permission_prompt</code>), <code>request_user_input</code></td><td><code>muse resume &lt;id&gt;</code></td></tr>
         </tbody>
       </table>
     </div>
@@ -599,7 +634,7 @@ footer .r { margin-left: auto; }
     </div>
     <div class="grid g2">
       <div class="card"><div class="ic c-acc">⇢</div><h3>Detach and attach</h3><p>Run <code>trix</code> again from any terminal to pick up where you were, scrollback included. <code>trix ls</code> shows who needs you without attaching.</p></div>
-      <div class="card"><div class="ic c-done">↻</div><h3>Survives restarts</h3><p>The workspace is saved as it changes. After a crash, a reboot or <code>trix kill</code>, Claude, Codex, Grok, OpenCode and Cursor resume the exact conversation each pane was in, and shells reopen in their folder.</p></div>
+      <div class="card"><div class="ic c-done">↻</div><h3>Survives restarts</h3><p>The workspace is saved as it changes. After a crash, a reboot or <code>trix kill</code>, Claude, Codex, Grok, OpenCode, Cursor, Copilot and Muse resume the exact conversation each pane was in, and shells reopen in their folder.</p></div>
       <div class="card"><div class="ic" style="color:var(--mag)">◇</div><h3>Named sessions</h3><p><code>trix -s work</code> and <code>trix -s home</code> are separate workspaces, each with its own agents, saved layout and attached terminal.</p></div>
       <div class="card"><div class="ic c-start">◉</div><h3>Watch without taking over</h3><p><code>trix view</code> attaches read-only from any number of other terminals: a second monitor, a laptop over SSH, a teammate on the same box. Nothing a viewer types reaches an agent.</p></div>
     </div>
@@ -635,7 +670,7 @@ footer .r { margin-left: auto; }
 
   <section id="config">
     <h2>Make it yours.</h2>
-    <p class="sub">One optional file, <code>~/.config/trix/config.toml</code>, changes keys, notifications and sounds. trix reloads it within a second of each save, and <code>trix config</code> checks it from the command line.</p>
+    <p class="sub">One optional file, <code>~/.config/trix/config.toml</code>, changes keys, notifications and sounds. trix reloads it within a second of each save, and <code>trix config</code> checks it from the command line. Most of it you can also change from the settings (<code>alt+,</code>), which write the file for you.</p>
     <div class="persist">
       <div class="code toml" aria-label="A sample trix config file">
 <div class="fname"># ~/.config/trix/config.toml</div>
@@ -682,22 +717,69 @@ footer .r { margin-left: auto; }
       <div class="key"><kbd>alt+b</kbd><span>broadcast a prompt</span></div>
       <div class="key"><kbd>alt+f</kbd><span>search every agent's scrollback</span></div>
       <div class="key"><kbd>alt+r</kbd><kbd>alt+w</kbd><span>rename (or double-click it) / close</span></div>
+      <div class="key"><kbd>alt+x</kbd><span>select an agent (or alt+click its card)</span></div>
       <div class="key"><kbd>alt+o</kbd><span>agent menu (or right-click)</span></div>
       <div class="key"><kbd>alt+d</kbd><span>detach (agents keep running)</span></div>
       <div class="key"><kbd>alt+s</kbd><span>toggle sidebar</span></div>
-      <div class="key"><kbd>alt+m</kbd><span>mini sidebar: one line per agent, half the width</span></div>
+      <div class="key"><kbd>alt+m</kbd><span>sidebar size: wide, narrow, icons only</span></div>
       <div class="key"><kbd>alt+c</kbd><span>one-line cards, instead of full ones that scroll</span></div>
+      <div class="key"><kbd>alt+,</kbd><span>settings: theme, sidebar, alerts</span></div>
       <div class="key"><kbd>alt+?</kbd><span>all keys</span></div>
       <div class="key"><kbd>alt+q</kbd><span>quit (stops every agent)</span></div>
     </div>
   </section>
 
+  <section id="new">
+    <h2>What's new.</h2>
+    <p class="sub">The latest releases of trix. This list comes from GitHub, so it is always current. <a href="https://github.com/leofle/trix/releases">All releases ↗</a></p>
+    <div class="rels" id="rels">
+      <div class="rel latest">
+        <div><a class="tag" href="https://github.com/leofle/trix/releases/tag/v1.0.8">v1.0.8</a><span class="when">Nov 15, 2026</span><span class="pill">latest</span></div>
+        <ul>
+          <li><a href="https://github.com/leofle/trix/pull/46">Select several agents and act on them at once <span class="pr">#46</span></a></li>
+          <li><a href="https://github.com/leofle/trix/pull/47">Icons rail numbers every agent; the top bar drops whole items when narrow <span class="pr">#47</span></a></li>
+        </ul>
+      </div>
+      <div class="rel">
+        <div><a class="tag" href="https://github.com/leofle/trix/releases/tag/v1.0.7">v1.0.7</a><span class="when">Nov 14, 2026</span></div>
+        <ul>
+          <li><a href="https://github.com/leofle/trix/pull/45">alt+m steps down to an icons-only sidebar <span class="pr">#45</span></a></li>
+        </ul>
+      </div>
+      <div class="rel">
+        <div><a class="tag" href="https://github.com/leofle/trix/releases/tag/v1.0.6">v1.0.6</a><span class="when">Nov 14, 2026</span></div>
+        <ul>
+          <li><a href="https://github.com/leofle/trix/pull/43">Remember the grid view across restarts <span class="pr">#43</span></a></li>
+        </ul>
+      </div>
+      <div class="rel">
+        <div><a class="tag" href="https://github.com/leofle/trix/releases/tag/v1.0.5">v1.0.5</a><span class="when">Nov 14, 2026</span></div>
+        <ul>
+          <li><a href="https://github.com/leofle/trix/pull/42">Grid: pane titles keep the name last; the sidebar steps aside for a narrow grid <span class="pr">#42</span></a></li>
+        </ul>
+      </div>
+      <div class="rel">
+        <div><a class="tag" href="https://github.com/leofle/trix/releases/tag/v1.0.4">v1.0.4</a><span class="when">Nov 14, 2026</span></div>
+        <ul>
+          <li><a href="https://github.com/leofle/trix/pull/40">Keep every dialog inside its borders on a short terminal <span class="pr">#40</span></a></li>
+          <li><a href="https://github.com/leofle/trix/pull/41">Drop whole items from the Keys legend when it's narrow <span class="pr">#41</span></a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
   <section id="install">
     <h2>Get it running.</h2>
-    <p class="sub">Runs on Linux and macOS. Install it with <a href="https://brew.sh">Homebrew</a>, or build it with <a href="https://rustup.rs">Rust</a>, and start it with whatever agents you want.</p>
+    <p class="sub">Runs on Linux and macOS. Install it with <a href="https://brew.sh">Homebrew</a>, download a release, or build it with <a href="https://rustup.rs">Rust</a>. Then start it with whatever agents you want.</p>
+    <p class="relnote">Latest: <a href="https://github.com/leofle/trix/releases/latest" data-version-link><b data-version>v1.0.8</b></a> <span data-version-date>(Nov 15, 2026)</span>. <code>brew upgrade trix</code> gets it.</p>
     <div class="code">
-<div><span class="p">$ </span>brew tap leofle/trix</div>
-<div><span class="p">$ </span>brew install trix</div>
+<div><span class="p">$ </span>brew install leofle/trix/trix</div>
+<div> </div>
+<div><span class="cm"># or download the latest release into ~/.local/bin</span></div>
+<div><span class="p">$ </span>os=$([ "$(uname)" = Darwin ] &amp;&amp; echo apple-darwin || echo unknown-linux-gnu)</div>
+<div><span class="p">$ </span>target=$(uname -m | sed 's/arm64/aarch64/')-$os</div>
+<div><span class="p">$ </span>curl -fsSL https://github.com/leofle/trix/releases/latest/download/trix-$target.tar.gz | tar -xz</div>
+<div><span class="p">$ </span>mkdir -p ~/.local/bin &amp;&amp; mv trix-$target/trix ~/.local/bin/ &amp;&amp; rm -r trix-$target</div>
 <div> </div>
 <div><span class="cm"># or build it from source</span></div>
 <div><span class="p">$ </span>git clone https://github.com/leofle/trix.git &amp;&amp; cd trix</div>
@@ -705,7 +787,7 @@ footer .r { margin-left: auto; }
 <div> </div>
 <div><span class="p">$ </span>trix                      <span class="cm"># open the workspace, or attach to the running one</span></div>
 <div><span class="p">$ </span>trix claude codex shell   <span class="cm"># …and start these agents in the current folder</span></div>
-<div>                            <span class="cm"># (also grok, opencode, cursor; missing ones install first)</span></div>
+<div>                            <span class="cm"># (also grok, opencode, cursor, copilot, muse; missing ones install first)</span></div>
 <div><span class="p">$ </span>trix attach               <span class="cm"># attach only; fails if nothing is running</span></div>
 <div><span class="p">$ </span>trix view                 <span class="cm"># watch read-only from another terminal (q leaves)</span></div>
 <div><span class="p">$ </span>trix ls                   <span class="cm"># agents and states, without attaching</span></div>
@@ -765,6 +847,52 @@ footer .r { margin-left: auto; }
     catch { b.textContent = 'select it'; }
     setTimeout(() => b.textContent = 'copy', 1600);
   }));
+
+  /* ---- version and what's new, read from GitHub's releases ----
+     The HTML already holds the latest release at the time of the last edit.
+     This replaces it with whatever is current, so a new trix release shows
+     up here without touching the site. */
+  let VERSION = document.querySelector('[data-version]').textContent;
+  (async () => {
+    const KEY = 'trix-releases', TTL = 10 * 60 * 1000;
+    let rels;
+    try { const c = JSON.parse(sessionStorage.getItem(KEY)); if (c && Date.now() - c.at < TTL) rels = c.rels; } catch {}
+    if (!rels) {
+      try {
+        const r = await fetch('https://api.github.com/repos/leofle/trix/releases?per_page=10', { headers: { Accept: 'application/vnd.github+json' } });
+        if (!r.ok) return;
+        rels = (await r.json()).filter(x => !x.draft && !x.prerelease)
+          .map(x => ({ tag: x.tag_name, url: x.html_url, at: x.published_at, body: x.body || '' }));
+        try { sessionStorage.setItem(KEY, JSON.stringify({ at: Date.now(), rels })); } catch {}
+      } catch { return; }
+    }
+    if (!rels || !rels.length) return;
+
+    const day = iso => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+    const attr = s => esc(s).replace(/"/g, '&quot;');
+    const latest = rels[0];
+    VERSION = latest.tag;
+    document.querySelectorAll('[data-version]').forEach(e => e.textContent = latest.tag);
+    document.querySelectorAll('[data-version-link]').forEach(e => e.href = latest.url);
+    document.querySelectorAll('[data-version-date]').forEach(e => e.textContent = `(${day(latest.at)})`);
+
+    // GitHub's generated notes: "* Title by @user in https://github.com/…/pull/42".
+    // Version bumps and test-only changes are left out.
+    const NOISE = /^Version \d|\btests?\b|\bCI\b/i;
+    const changes = body => body.split(/^## New Contributors/m)[0].split('\n')
+      .map(l => l.match(/^[*-] (?!@)(.+?)(?: by @[\w-]+)?(?: in (https:\/\/github\.com\/[\w.\/-]+\/pull\/(\d+)))?\s*$/))
+      .filter(m => m && !NOISE.test(m[1]))
+      .map(m => ({ title: m[1], url: m[2], num: m[3] }));
+    const shown = rels.map(r => ({ ...r, items: changes(r.body) })).filter(r => r.items.length).slice(0, 5);
+    if (!shown.length) return;
+    $('rels').innerHTML = shown.map(r => `
+      <div class="rel${r.tag === latest.tag ? ' latest' : ''}">
+        <div><a class="tag" href="${attr(r.url)}">${esc(r.tag)}</a><span class="when">${day(r.at)}</span>${r.tag === latest.tag ? '<span class="pill">latest</span>' : ''}</div>
+        <ul>${r.items.map(c => c.url
+          ? `<li><a href="${attr(c.url)}">${esc(c.title)} <span class="pr">#${c.num}</span></a></li>`
+          : `<li>${esc(c.title)}</li>`).join('')}</ul>
+      </div>`).join('');
+  })();
 
   /* ---- states section ---- */
   const chips = [...document.querySelectorAll('.chip')];
@@ -845,7 +973,7 @@ footer .r { margin-left: auto; }
     const c = { blocked: 0, working: 0, done: 0 };
     A.forEach(a => c[a.st] !== undefined && c[a.st]++);
     const hh = new Date(); const time = `${String(hh.getHours()).padStart(2,'0')}:${String(hh.getMinutes()).padStart(2,'0')}`;
-    $('topbar').innerHTML = `<span class="c-acc">◆ <b style="color:#c0caf5">trix</b></span>` +
+    $('topbar').innerHTML = `<span class="c-acc">◆ <b style="color:#c0caf5">trix</b> <span style="color:var(--dim)">${esc(VERSION)}</span></span>` +
       (c.blocked ? `<span class="c-block">▲ ${c.blocked} needs you</span>` : '') +
       (c.working ? `<span class="c-work">${SPIN[frame % 10]} ${c.working} working</span>` : '') +
       (c.done ? `<span class="c-done">✓ ${c.done} done</span>` : '') +
