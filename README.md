@@ -6,11 +6,26 @@ Live at https://leofle.github.io/trix-web/
 
 ## Files
 
-- `index.html`: the whole site, with its CSS and JS inline
-- `logo.svg`: the mascot
-- `favicon.svg`: the tab icon
+- `index.html`: the whole site, with its CSS and JS inline. This includes the animated mascot and the preloader that shows while the page loads.
+- `logo.svg`: Trixy, the trix mascot. It's pixel art, 13×14 pixels.
+- `favicon.svg`: the tab icon. It's the same character centered in a square, and the site also uses it in the nav and footer.
+- `brand/`: the logo in other sizes and formats, for use outside the site.
 
 There is no build step and nothing to install. Fonts load from Google Fonts.
+
+## Logo files
+
+Everything in `brand/` is Trixy. The pixels stay sharp at every size because each file uses a whole-number scale.
+
+- `brand/svg/`: vector files. Use these when you can. There is the logo, a square version, and one-color black and white versions.
+- `brand/png/native/`: the logo at 1x to 64x, from 13×14 up to 832×896.
+- `brand/png/square/`: square, with a transparent background, from 16 to 1024 px.
+- `brand/png/app-icon/`: square on the site's dark background, at 180, 192, 512 and 1024 px.
+- `brand/png/mono/`: the one-color versions at 512 px.
+- `brand/webp/`: square, with a transparent background, at 256 and 512 px.
+- `brand/favicon/`: `favicon.ico` (16, 32 and 48 px), `favicon.svg`, `apple-touch-icon.png`, and icons at 192 and 512 px.
+
+The colors are body `#82A1F1`, highlight `#B7C9F7`, bulb `#D8B172`, eyes `#14141A`, and the site background `#0d0e15`.
 
 ## Run it locally
 

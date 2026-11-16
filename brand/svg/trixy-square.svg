@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.5 -1 16 16" width="512" height="512" shape-rendering="crispEdges">
+  <!-- Trixy centered in a square. -->
+  <path fill="#D8B172" d="M5 0h3v1h-3z M5 1h1v1h-1z M7 1h1v1h-1z M5 2h3v1h-3z"/>
+  <path fill="#B7C9F7" d="M6 1h1v1h-1z"/>
+  <path fill="#82A1F1" d="M6 3h1v2h-1z M1 5h11v1h-11z M0 6h13v6h-13z M1 12h11v1h-11z M2 13h2v1h-2z M9 13h2v1h-2z"/>
+  <path fill="#B7C9F7" d="M1 6h1v2h-1z"/>
+  <path fill="#14141A" d="M3 8h1v2h-1z M9 8h1v2h-1z"/>
+</svg>
