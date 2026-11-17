@@ -448,6 +448,7 @@ footer .r { margin-left: auto; }
         <div class="install"><span class="p">$</span><code>brew install leofle/trix/trix</code><button class="copy" data-copy="brew install leofle/trix/trix">copy</button></div>
         <a class="btn" href="#install">get trix →</a>
       </div>
+      <p class="codex-note">Arch or Omarchy? <a href="#install">Use the pacman package ↓</a></p>
     </div>
     <div class="stage" id="hero-stage" data-state="working">
       <div data-mascot id="hero-mascot"></div>
@@ -601,9 +602,12 @@ footer .r { margin-left: auto; }
   <section id="install">
     <h2>Get it running.</h2>
     <p class="sub">Runs on Linux and macOS. <a href="https://github.com/leofle/trix#use">Other ways to install ↗</a></p>
-    <p class="relnote">Latest: <a href="https://github.com/leofle/trix/releases/latest" data-version-link><b data-version>v1.1.5</b></a> <span data-version-date>(Nov 15, 2026)</span>. <code>brew upgrade trix</code> gets it.</p>
+    <p class="relnote">Latest: <a href="https://github.com/leofle/trix/releases/latest" data-version-link><b data-version>v1.1.5</b></a> <span data-version-date>(Nov 15, 2026)</span>. <code>brew upgrade trix</code> gets it; on Arch, run the two pacman lines again.</p>
     <div class="code">
 <div><span class="p">$ </span>brew install leofle/trix/trix</div>
+<div><span class="cm"># or on Arch / Omarchy (x86_64, aarch64):</span></div>
+<div><span class="p">$ </span>curl -fLO https://github.com/leofle/trix/releases/latest/download/trix-$(uname -m).pkg.tar.zst</div>
+<div><span class="p">$ </span>sudo pacman -U ./trix-$(uname -m).pkg.tar.zst</div>
 <div> </div>
 <div><span class="p">$ </span>trix                      <span class="cm"># open the workspace, or attach to the running one</span></div>
 <div><span class="p">$ </span>trix claude codex shell   <span class="cm"># …and start these agents in the current folder</span></div>
