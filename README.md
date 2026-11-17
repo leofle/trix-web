@@ -2,7 +2,7 @@
 
 The website for [trix](https://github.com/leofle/trix).
 
-Live at https://leofle.github.io/trix-web/
+Live at https://trixapp.ai/
 
 ## Files
 
