@@ -279,6 +279,7 @@ kbd { font: 700 13px var(--mono); color: var(--fg-hi); background: var(--surface
 .code div { white-space: pre; }
 .code .p { color: var(--done); user-select: none; }
 .code .cm { color: var(--dim); }
+.code div.wrap { white-space: pre-wrap; overflow-wrap: anywhere; padding-left: 2ch; text-indent: -2ch; }
 
 /* agent control */
 .persist { display: grid; grid-template-columns: 1.35fr 1fr; gap: 14px; align-items: stretch; }
@@ -602,12 +603,11 @@ footer .r { margin-left: auto; }
   <section id="install">
     <h2>Get it running.</h2>
     <p class="sub">Runs on Linux and macOS. <a href="https://github.com/leofle/trix#use">Other ways to install ↗</a></p>
-    <p class="relnote">Latest: <a href="https://github.com/leofle/trix/releases/latest" data-version-link><b data-version>v1.1.5</b></a> <span data-version-date>(Nov 15, 2026)</span>. <code>brew upgrade trix</code> gets it; on Arch, run the two pacman lines again.</p>
+    <p class="relnote">Latest: <a href="https://github.com/leofle/trix/releases/latest" data-version-link><b data-version>v1.1.5</b></a> <span data-version-date>(Nov 15, 2026)</span>. <code>brew upgrade trix</code> gets it; on Arch, run the pacman line again.</p>
     <div class="code">
 <div><span class="p">$ </span>brew install leofle/trix/trix</div>
-<div><span class="cm"># or on Arch / Omarchy (x86_64, aarch64):</span></div>
-<div><span class="p">$ </span>curl -fLO https://github.com/leofle/trix/releases/latest/download/trix-$(uname -m).pkg.tar.zst</div>
-<div><span class="p">$ </span>sudo pacman -U ./trix-$(uname -m).pkg.tar.zst</div>
+<div class="wrap"><span class="cm"># Arch-based distros only (Arch, Omarchy, EndeavourOS, Manjaro…), x86_64 / aarch64:</span></div>
+<div class="wrap"><span class="p">$ </span>curl -fLO https://github.com/leofle/trix/releases/latest/download/trix-$(uname -m).pkg.tar.zst &amp;&amp; sudo pacman -U ./trix-$(uname -m).pkg.tar.zst</div>
 <div> </div>
 <div><span class="p">$ </span>trix                      <span class="cm"># open the workspace, or attach to the running one</span></div>
 <div><span class="p">$ </span>trix claude codex shell   <span class="cm"># …and start these agents in the current folder</span></div>
