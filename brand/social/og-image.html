@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<title>trix social card source</title>
+<!-- Source of og-image.png, the 1200×630 card shown when trixapp.ai is shared.
+     Regenerate from this folder with:
+     chromium --headless --hide-scrollbars --window-size=1200,630 --screenshot=og-image.png og-image.html -->
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0d0e15; --surface:#16161e; --line:#262a3d; --fg:#a9b1d6; --fg-hi:#e1e6ff; --dim:#565f89;
+          --accent:#7aa2f7; --mag:#bb9af7; --cyan:#7dcfff; --block:#f7768e; --done:#9ece6a; --work:#e0af68; }
+  html, body { margin:0; width:1200px; height:630px; overflow:hidden; }
+  body { background:var(--bg); color:var(--fg); font:24px/1.5 "JetBrains Mono", monospace; position:relative;
+    -webkit-font-smoothing:antialiased; }
+  body::before { content:""; position:absolute; inset:0;
+    background:
+      radial-gradient(700px 420px at 80% 10%, rgba(187,154,247,.18), transparent 70%),
+      radial-gradient(600px 420px at 5% 0%, rgba(122,162,247,.14), transparent 70%),
+      radial-gradient(rgba(169,177,214,.09) 1px, transparent 1px) 0 0 / 22px 22px; }
+  .card { position:relative; display:grid; grid-template-columns:1fr 330px; gap:30px; align-items:center;
+    height:100%; padding:0 80px; box-sizing:border-box; }
+  .brand { display:flex; align-items:center; gap:16px; }
+  .brand img { width:54px; height:54px; }
+  .word { font:800 44px/1 "JetBrains Mono", monospace; color:var(--fg-hi); letter-spacing:-.04em; }
+  .word .i { position:relative; }
+  .word .i::after { content:""; position:absolute; left:44%; top:.21em; width:.2em; height:.2em; transform:translateX(-50%);
+    border-radius:50%; background:var(--done); box-shadow:0 0 14px var(--done); }
+  h1 { font:700 78px/1.02 "Space Grotesk", sans-serif; color:var(--fg-hi); letter-spacing:-.035em; margin:40px 0 26px; }
+  h1 .needs { color:var(--block); white-space:nowrap; }
+  p { margin:0; max-width:24em; }
+  .foot { display:flex; gap:18px; align-items:center; margin-top:40px; font-size:21px; }
+  .url { color:var(--accent); font-weight:700; }
+  .pill { color:var(--fg-hi); background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:8px 16px; }
+  .pill b { color:var(--done); font-weight:500; }
+  .stage { position:relative; display:grid; place-items:center; }
+  .stage::before { content:""; position:absolute; width:120%; aspect-ratio:1; border-radius:50%;
+    background:radial-gradient(circle, rgba(247,118,142,.30), transparent 62%); filter:blur(10px); }
+  .stage img { position:relative; width:290px; }
+  .bubble { position:absolute; top:-58px; right:-24px; font-size:20px; color:var(--fg-hi); background:var(--surface);
+    border:1px solid var(--block); padding:10px 16px; border-radius:14px 14px 14px 4px; white-space:nowrap; }
+  .bubble b { color:var(--block); }
+</style>
+</head>
+<body>
+<div class="card">
+  <div>
+    <div class="brand"><img src="../../favicon.svg" alt=""><span class="word">tr<span class="i">ı</span>x</span></div>
+    <h1>Know which agent <span class="needs">needs you.</span></h1>
+    <p>A terminal workspace for Claude Code, Codex, Gemini CLI and any CLI agent.</p>
+    <div class="foot"><span class="url">trixapp.ai</span><span class="pill"><b>$</b> brew install leofle/trix/trix</span></div>
+  </div>
+  <div class="stage">
+    <img src="../../logo.svg" alt="">
+    <div class="bubble"><b>▲</b> codex needs you</div>
+  </div>
+</div>
+</body>
+</html>
