@@ -9,7 +9,15 @@ Live at https://trixapp.ai/
 - `index.html`: the whole site, with its CSS and JS inline. This includes the animated mascot and the preloader that shows while the page loads.
 - `logo.svg`: Trixy, the trix mascot. It's pixel art, 13×14 pixels.
 - `favicon.svg`: the tab icon. It's the same character centered in a square, and the site also uses it in the nav and footer.
+- `favicon.ico`: a copy of `brand/favicon/favicon.ico`, for browsers and tools that only look at `/favicon.ico`.
 - `brand/`: the logo in other sizes and formats, for use outside the site.
+- `brand/social/og-image.png`: the 1200×630 card shown when a link to the site is shared. `og-image.html` next to it is its source; the comment at its top has the command that regenerates the PNG.
+- `robots.txt` and `sitemap.xml`: for search engines. `robots.txt` lets every crawler in, AI ones included, and points to the sitemap. Update the sitemap's `lastmod` when the page changes a lot.
+- `llms.txt`: a plain summary of trix with links to the docs, for AI tools ([llmstxt.org](https://llmstxt.org)). Keep it in step with the page and the trix README.
+
+## Search and AI answers
+
+The page's `<head>` has the title, description, Open Graph and Twitter card tags, and a JSON-LD block that describes trix as a `SoftwareApplication` and repeats the "Questions" section as an `FAQPage`. When you change a question or answer on the page, change it in the JSON-LD too, so the two match.
 
 There is no build step and nothing to install. Fonts load from Google Fonts.
 
