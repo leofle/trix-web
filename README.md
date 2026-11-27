@@ -49,8 +49,10 @@ then go to http://localhost:8000.
 
 The version number (in the nav, the hero, the demo's top bar and the install section) and the "What's new" list come from GitHub's releases for `leofle/trix`. The page fetches them when it loads, so a new trix release shows up on the site without any change here.
 
-`index.html` also holds a copy of the latest release, which shows if GitHub can't be reached. It's fine if that copy is a little out of date, but update it now and then.
+`index.html` also holds a copy of the latest release. It's what crawlers that don't run JavaScript see, most AI crawlers among them, and what shows if GitHub can't be reached. The deploy refreshes that copy (see below), so the live site always has the latest release. The copy committed here can lag behind; to refresh it by hand, run `python3 scripts/refresh-releases.py`.
 
 ## Deploy
 
-GitHub Pages serves the root of `main`. Push to `main` and the site updates a minute or two later.
+`.github/workflows/pages.yml` deploys the site to GitHub Pages: on every push to `main`, once an hour, and when run by hand from the Actions tab. Before each deploy it runs `scripts/refresh-releases.py`, which writes the latest trix release into the page, so a new release reaches the site within the hour without a commit here. If GitHub's API fails, the deploy goes ahead with the copy in the repo.
+
+Pages' source (Settings › Pages) must be "GitHub Actions" for this workflow to deploy.
